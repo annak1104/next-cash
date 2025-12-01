@@ -1,0 +1,10 @@
+{
+  "plugins": [
+    "prettier-plugin-organize-imports",
+    "prettier-plugin-tailwindcss"
+  ],
+  "importOrder": ["^react$", "<THIRD_PARTY_MODULES>", "^@/", "^[./]", ".css$"],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true,
+  "importOrderBuiltinModulesToTop": true
+}
