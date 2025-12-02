@@ -18,3 +18,10 @@ export const transactionsTable = pgTable("transactions", {
     .references(() => categoriesTable.id)
     .notNull(),
 });
+
+export const walletsTable = pgTable("wallets", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  userId: text("user_id").notNull(),
+  name: text().notNull(),
+  currency: text().notNull(),
+});

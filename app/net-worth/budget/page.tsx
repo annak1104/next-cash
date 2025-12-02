@@ -1,5 +1,6 @@
 import Cashflow from "@/app/net-worth/budget/cashflow/cashflow";
 import RecentTransactions from "@/app/net-worth/budget/recent-transactions";
+import WalletsSection from "./wallets-section";
 
 export default async function BudgetPage({
   searchParams,
@@ -15,6 +16,7 @@ export default async function BudgetPage({
   }
   return (
     <div className="mx-auto max-w-7xl px-1 py-5">
+      <WalletsSection />
       <Cashflow year={cfYear} />
       <RecentTransactions />
     </div>
