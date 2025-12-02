@@ -1,5 +1,13 @@
 import { ThemeProvider } from "@/components/theme-provider";
 import { Button } from "@/components/ui/button";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
 import UserDropdown from "@/components/user-dropdown";
 import {
   ClerkProvider,
@@ -47,6 +55,28 @@ export default function RootLayout({
               >
                 <ChartColumnBigIcon className="text-lime-500" /> NextCash
               </Link>
+              <div>
+                <NavigationMenu className="bg-accent">
+                  <NavigationMenuList>
+                    <NavigationMenuItem>
+                      <NavigationMenuTrigger>Portfolios</NavigationMenuTrigger>
+                      <NavigationMenuContent>
+                        <NavigationMenuLink asChild>
+                          <Link href="/dashboard">Dashboard</Link>
+                        </NavigationMenuLink>
+                      </NavigationMenuContent>
+                    </NavigationMenuItem>
+                    <NavigationMenuItem>
+                      <NavigationMenuTrigger>Net-worth</NavigationMenuTrigger>
+                      <NavigationMenuContent>
+                        <NavigationMenuLink asChild>
+                          <Link href="/net-worth/budget">Budget</Link>
+                        </NavigationMenuLink>
+                      </NavigationMenuContent>
+                    </NavigationMenuItem>
+                  </NavigationMenuList>
+                </NavigationMenu>
+              </div>
               <div>
                 <SignedOut>
                   <div className="flex items-center">
