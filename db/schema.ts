@@ -50,3 +50,26 @@ export const transactionsTable = pgTable("transactions", {
   // For linking transfer transactions together
   transferId: integer("transfer_id").references(() => transfersTable.id),
 });
+
+export const portfoliosTable = pgTable("portfolios", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  userId: text("user_id").notNull(),
+  name: text().notNull(),
+  description: text(),
+  currency: text().notNull().default("USD"),
+});
+
+export const holdingsTable = pgTable("holdings", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  portfolioId: integer("portfolio_id")
+    .references(() => portfoliosTable.id)
+    .notNull(),
+  assetType: text({ enum: ["crypto", "stock"] }).notNull(),
+  symbol: text().notNull(), // BTC, ETH, AAPL, etc.
+  name: text().notNull(),
+  image: text(), // URL to asset image/logo
+  quantity: numeric().notNull(), // Amount of asset held
+  avgPrice: numeric("avg_price").notNull(), // Average purchase price
+  currentPrice: numeric("current_price"), // Current market price (can be updated)
+  coinGeckoId: text("coin_gecko_id"), // For crypto assets from CoinGecko API
+});

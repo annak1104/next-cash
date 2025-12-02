@@ -1,6 +1,6 @@
 export interface HoldingRow {
   id: string;
-  image: string;
+  image?: string;
   symbol: string;
   name: string;
   quantity: number;
@@ -12,4 +12,5 @@ export interface HoldingRow {
   marketValue: number;
   unrealizedPL: number;
   allocation: number;
+  assetType?: "crypto" | "stock"; // Optional for backward compatibility
 }

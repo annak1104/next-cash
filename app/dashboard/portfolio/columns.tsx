@@ -8,12 +8,26 @@ import { HoldingRow } from "@/types/HoldingRow";
 export const columns: ColumnDef<HoldingRow>[] = [
   {
     accessorKey: "name",
-    header: "Назва",
+    header: "Name",
     cell: ({ row }) => {
       const { image, symbol, name } = row.original;
       return (
         <div className="flex items-center gap-2">
-          <Image src={image} alt={name} width={28} height={28} className="rounded-full" />
+          {image ? (
+            <Image
+              src={image}
+              alt={name}
+              width={28}
+              height={28}
+              className="rounded-full"
+            />
+          ) : (
+            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-muted">
+              <span className="text-xs font-medium">
+                {symbol.substring(0, 2)}
+              </span>
+            </div>
+          )}
           <div className="flex flex-col">
             <span className="font-medium">{symbol}</span>
             <span className="text-xs text-muted-foreground">{name}</span>
@@ -24,21 +38,28 @@ export const columns: ColumnDef<HoldingRow>[] = [
   },
   {
     accessorKey: "quantity",
-    header: "Кількість",
-    cell: ({ getValue }) => Number(getValue()).toFixed(4),
+    header: "Position",
+    cell: ({ getValue }) => Number(getValue()).toFixed(5),
   },
   {
     accessorKey: "currentPrice",
-    header: "Ціна",
-    cell: ({ getValue }) => `$${Number(getValue()).toFixed(2)}`,
+    header: "Price",
+    cell: ({ getValue }) => {
+      const price = Number(getValue());
+      if (price >= 1000) {
+        return `$${(price / 1000).toFixed(2)}K`;
+      }
+      return `$${price.toFixed(2)}`;
+    },
   },
   {
     accessorKey: "change24h",
-    header: "% Зміна",
+    header: "% Change",
     cell: ({ getValue }) => {
       const val = Number(getValue());
       return (
         <span className={val >= 0 ? "text-green-500" : "text-red-500"}>
+          {val >= 0 ? "+" : ""}
           {val.toFixed(2)}%
         </span>
       );
@@ -46,46 +67,68 @@ export const columns: ColumnDef<HoldingRow>[] = [
   },
   {
     accessorKey: "dailyPL",
-    header: "Денний P&L",
+    header: "Daily P&L",
     cell: ({ getValue }) => {
       const val = Number(getValue());
       return (
         <span className={val >= 0 ? "text-green-500" : "text-red-500"}>
-          {val >= 0 ? "+" : "-"}${Math.abs(val).toFixed(2)}
+          {val >= 0 ? "+" : ""}${Math.abs(val).toFixed(2)}
         </span>
       );
     },
   },
   {
     accessorKey: "avgPrice",
-    header: "Сер. ціна",
-    cell: ({ getValue }) => `$${Number(getValue()).toFixed(2)}`,
+    header: "Avg. price",
+    cell: ({ getValue }) => {
+      const price = Number(getValue());
+      if (price >= 1000) {
+        return `$${(price / 1000).toFixed(2)}K`;
+      }
+      return `$${price.toFixed(2)}`;
+    },
   },
   {
     accessorKey: "invested",
-    header: "Інвестовано",
+    header: "Cost basis",
     cell: ({ getValue }) => `$${Number(getValue()).toFixed(2)}`,
   },
   {
     accessorKey: "marketValue",
-    header: "Ринкова вартість",
+    header: "Market value",
     cell: ({ getValue }) => `$${Number(getValue()).toFixed(2)}`,
   },
   {
     accessorKey: "unrealizedPL",
-    header: "Нереалізований P&L",
+    header: "Unrealized P&L",
     cell: ({ getValue }) => {
       const val = Number(getValue());
       return (
         <span className={val >= 0 ? "text-green-500" : "text-red-500"}>
-          {val >= 0 ? "+" : "-"}${Math.abs(val).toFixed(2)}
+          {val >= 0 ? "+" : ""}${Math.abs(val).toFixed(2)}
+        </span>
+      );
+    },
+  },
+  {
+    id: "unrealizedPLPercent",
+    header: "% Unrealized P&L",
+    cell: ({ row }) => {
+      const invested = Number(row.original.invested);
+      const unrealizedPL = Number(row.original.unrealizedPL);
+      const percent =
+        invested > 0 ? (unrealizedPL / invested) * 100 : 0;
+      return (
+        <span className={percent >= 0 ? "text-green-500" : "text-red-500"}>
+          {percent >= 0 ? "+" : ""}
+          {percent.toFixed(2)}%
         </span>
       );
     },
   },
   {
     accessorKey: "allocation",
-    header: "Алоцація",
+    header: "Allocation",
     cell: ({ getValue }) => `${Number(getValue()).toFixed(2)}%`,
   },
 ];
