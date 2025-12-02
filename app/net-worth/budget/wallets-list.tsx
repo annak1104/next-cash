@@ -10,6 +10,7 @@ type Wallet = {
   id: number;
   name: string;
   currency: string;
+  balance: number;
 };
 
 export default function WalletsList({ wallets }: { wallets: Wallet[] }) {
@@ -20,13 +21,7 @@ export default function WalletsList({ wallets }: { wallets: Wallet[] }) {
       <ScrollArea className="w-full whitespace-nowrap">
         <div className="flex gap-4 pb-4">
           {wallets.map((wallet) => (
-            <WalletCard
-              key={wallet.id}
-              wallet={{
-                ...wallet,
-                balance: 0, // TODO: Calculate actual balance from transactions
-              }}
-            />
+            <WalletCard key={wallet.id} wallet={wallet} />
           ))}
           {/* Create new account card */}
           <div className="flex min-w-[180px] flex-col items-center justify-center rounded-lg border border-dashed bg-muted/50 p-4">

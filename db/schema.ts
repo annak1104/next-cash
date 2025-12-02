@@ -3,9 +3,15 @@ import { date, integer, numeric, pgTable, text } from "drizzle-orm/pg-core";
 export const categoriesTable = pgTable("categories", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   name: text().notNull(),
-  type: text({
-    enum: ["income", "expense"],
-  }).notNull(),
+  type: text({ enum: ["income", "expense"] }).notNull(),
+});
+
+// MUST be before transactionsTable
+export const walletsTable = pgTable("wallets", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  userId: text("user_id").notNull(),
+  name: text().notNull(),
+  currency: text().notNull(),
 });
 
 export const transactionsTable = pgTable("transactions", {
@@ -17,11 +23,5 @@ export const transactionsTable = pgTable("transactions", {
   categoryId: integer("category_id")
     .references(() => categoriesTable.id)
     .notNull(),
-});
-
-export const walletsTable = pgTable("wallets", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  userId: text("user_id").notNull(),
-  name: text().notNull(),
-  currency: text().notNull(),
+  walletId: integer("wallet_id").references(() => walletsTable.id),
 });
