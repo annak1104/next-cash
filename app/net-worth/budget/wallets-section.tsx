@@ -34,13 +34,13 @@ export default async function WalletsSection() {
           </Link>
         </Button>
         <Button variant="outline" asChild>
-          <Link href="">
+          <Link href="/dashboard/transactions/transfer">
             <ArrowsUpFromLine />
             Transfers
           </Link>
         </Button>
         <Button variant="outline" asChild>
-          <Link href="">
+          <Link href="/dashboard/transactions/adjustment">
             <Calculator />
             Adjustment
           </Link>

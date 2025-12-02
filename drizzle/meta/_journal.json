@@ -22,6 +22,13 @@
       "when": 1764694595832,
       "tag": "0002_shocking_vin_gonzales",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1764697117536,
+      "tag": "0003_spotty_mockingbird",
+      "breakpoints": true
     }
   ]
 }
