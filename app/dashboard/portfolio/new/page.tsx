@@ -6,10 +6,17 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 
-export default function AddNewCurrencyPage() {
+import getPortfolios from "@/data/getPortfolios";
+import getWallets from "@/data/getWallets";
+import NewTradeForm from "./new-trade-form";
+
+export default async function AddNewCurrencyPage() {
+  const portfolios = await getPortfolios();
+  const wallets = await getWallets();
+
   return (
     <div className="mx-auto max-w-7xl px-1 py-10">
       <Breadcrumb>
@@ -21,16 +28,19 @@ export default function AddNewCurrencyPage() {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link href="/dashboard/portfolio">Portfolio</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
             <BreadcrumbPage>Add new buy transaction</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <Card className="mt-4 max-w-3xl">
-        <CardHeader>
-          <CardTitle>New Transaction</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {/* <NewTransactionForm categories={categories} /> */}111
+      <Card className="mt-4 max-w-4xl">
+        <CardContent className="pt-6">
+          <NewTradeForm portfolios={portfolios} wallets={wallets} />
         </CardContent>
       </Card>
     </div>

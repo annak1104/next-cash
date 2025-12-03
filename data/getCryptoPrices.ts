@@ -2,7 +2,7 @@
 
 const COINGECKO_API = "https://api.coingecko.com/api/v3";
 
-let priceCache: Record<string, { price: number; change24h: number; timestamp: number }> = {};
+const priceCache: Record<string, { price: number; change24h: number; timestamp: number }> = {};
 const CACHE_LIFETIME = 1000 * 60 * 5; // 5 minutes
 
 export async function getCryptoPrices(
