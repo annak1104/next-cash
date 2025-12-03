@@ -13,7 +13,7 @@ export default async function PortfolioPage() {
   return (
     <div className="mx-auto max-w-7xl px-1 py-10">
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-4xl font-semibold">Holdings</h1>
+        <h1 className="text-2xl font-semibold">Holdings</h1>
         <div className="flex gap-2">
           <Button asChild variant="outline">
             <Link href="/dashboard/portfolio/new">

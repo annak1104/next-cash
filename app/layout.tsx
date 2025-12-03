@@ -48,18 +48,20 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <nav className="bg-primary flex h-20 items-center justify-between p-4 text-white">
+            <nav className="bg-background flex h-16 items-center justify-between border-b p-4 text-white">
               <Link
                 href="/"
-                className="flex items-center gap-1 text-2xl font-bold"
+                className="flex text-primary items-center gap-1 text-2xl font-bold"
               >
                 <ChartColumnBigIcon className="text-lime-500" /> NextCash
               </Link>
               <div>
-                <NavigationMenu className="bg-accent">
+                <NavigationMenu className="">
                   <NavigationMenuList>
-                    <NavigationMenuItem>
-                      <NavigationMenuTrigger>Portfolios</NavigationMenuTrigger>
+                    <NavigationMenuItem className="relative">
+                      <NavigationMenuTrigger className="text-primary">
+                        Portfolios
+                      </NavigationMenuTrigger>
                       <NavigationMenuContent>
                         <NavigationMenuLink asChild>
                           <Link href="/dashboard">Dashboard</Link>
@@ -69,8 +71,10 @@ export default function RootLayout({
                         </NavigationMenuLink>
                       </NavigationMenuContent>
                     </NavigationMenuItem>
-                    <NavigationMenuItem>
-                      <NavigationMenuTrigger>Net-worth</NavigationMenuTrigger>
+                    <NavigationMenuItem className="relative">
+                      <NavigationMenuTrigger className="text-primary">
+                        Net-worth
+                      </NavigationMenuTrigger>
                       <NavigationMenuContent>
                         <NavigationMenuLink asChild>
                           <Link href="/net-worth/budget">Budget</Link>
