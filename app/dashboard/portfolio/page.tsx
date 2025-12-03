@@ -1,24 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import Link from "next/link";
-import PortfolioCards from "./portfolio-cards";
-import PortfolioSummary from "./portfolio-summary";
 import CreatePortfolioButton from "./create-portfolio-button";
 import getPortfolios from "@/data/getPortfolios";
+import { getPortfolioHoldings } from "@/data/getPortfolioHoldings";
+import PortfolioHoldingsSection from "./portfolio-holdings-section";
 
 export default async function PortfolioPage() {
   const portfolios = await getPortfolios();
-
-  // TODO: Calculate actual portfolio stats from holdings
-  const stats = {
-    totalValue: 0,
-    dailyPL: 0,
-    dailyPLPercent: 0,
-    unrealizedPL: 0,
-    unrealizedPLPercent: 0,
-    cash: 0,
-    currency: "USD",
-  };
+  const initialHoldings = await getPortfolioHoldings();
 
   return (
     <div className="mx-auto max-w-7xl px-1 py-10">
@@ -35,17 +25,10 @@ export default async function PortfolioPage() {
         </div>
       </div>
 
-      <div className="mb-6 space-y-4">
-        <PortfolioCards stats={stats} portfolios={portfolios} />
-
-        <PortfolioSummary stats={stats} />
-      </div>
-
-      {/* TODO: Add filters and holdings table */}
-      <div className="text-muted-foreground text-center">
-        Portfolios: {portfolios.length}
-        {/* Holdings table will be added here */}
-      </div>
+      <PortfolioHoldingsSection
+        portfolios={portfolios}
+        initialHoldings={initialHoldings}
+      />
     </div>
   );
 }

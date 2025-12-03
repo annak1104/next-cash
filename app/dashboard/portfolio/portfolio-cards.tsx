@@ -1,6 +1,9 @@
+"use client";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Zap, DollarSign } from "lucide-react";
 import { formatCurrency } from "@/lib/currency-utils";
+import { cn } from "@/lib/utils";
 
 type PortfolioStats = {
   totalValue: number;
@@ -23,13 +26,29 @@ type Portfolio = {
 type Props = {
   stats: PortfolioStats;
   portfolios: Portfolio[];
+  selectedPortfolioId?: string | "all";
+  onSelectPortfolio?: (portfolioId: string | "all") => void;
 };
 
-export default function PortfolioCards({ stats, portfolios }: Props) {
+export default function PortfolioCards({
+  stats,
+  portfolios,
+  selectedPortfolioId = "all",
+  onSelectPortfolio,
+}: Props) {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       {/* All portfolios card */}
-      <Card>
+      <Card
+        role={onSelectPortfolio ? "button" : undefined}
+        tabIndex={onSelectPortfolio ? 0 : undefined}
+        onClick={() => onSelectPortfolio?.("all")}
+        className={cn(
+          "cursor-pointer transition",
+          selectedPortfolioId === "all" &&
+            "border-primary ring-1 ring-primary/30",
+        )}
+      >
         <CardContent className="pt-6">
           <div className="flex items-start justify-between">
             <div className="space-y-2">
@@ -63,7 +82,17 @@ export default function PortfolioCards({ stats, portfolios }: Props) {
 
       {/* Render each portfolio */}
       {portfolios.map((portfolio) => (
-        <Card key={portfolio.id}>
+        <Card
+          key={portfolio.id}
+          role={onSelectPortfolio ? "button" : undefined}
+          tabIndex={onSelectPortfolio ? 0 : undefined}
+          onClick={() => onSelectPortfolio?.(portfolio.id)}
+          className={cn(
+            "cursor-pointer transition",
+            selectedPortfolioId === portfolio.id &&
+              "border-primary ring-1 ring-primary/30",
+          )}
+        >
           <CardContent className="pt-6">
             <div className="space-y-2">
               <div className="flex items-center gap-2">

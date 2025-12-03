@@ -1,3 +1,5 @@
+"use client";
+
 import { ChevronDown, TrendingUp, TrendingDown } from "lucide-react";
 import { formatCurrency } from "@/lib/currency-utils";
 import {
