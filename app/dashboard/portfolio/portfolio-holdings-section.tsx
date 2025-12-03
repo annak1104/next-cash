@@ -76,9 +76,12 @@ export default function PortfolioHoldingsSection({
     string | "all"
   >("all");
   const [holdings, setHoldings] = useState<HoldingRow[]>(initialHoldings);
-  const [stats, setStats] = useState<PortfolioStats>(
+  // Global stats for all portfolios (used by "All portfolios" card)
+  const [allStats, setAllStats] = useState<PortfolioStats>(
     calculateStats(initialHoldings),
   );
+  // Stats for currently selected portfolio (used by summary section)
+  const [stats, setStats] = useState<PortfolioStats>(calculateStats(initialHoldings));
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -104,6 +107,11 @@ export default function PortfolioHoldingsSection({
 
       const data: HoldingRow[] = await response.json();
       setHoldings(data);
+      // When "All portfolios" is selected, keep the card stats in sync with
+      // the same holdings that back the table and summary.
+      if (portfolioId === "all") {
+        setAllStats(calculateStats(data));
+      }
     } catch (err) {
       console.error(err);
       setError("Failed to load holdings. Please try again.");
@@ -115,7 +123,9 @@ export default function PortfolioHoldingsSection({
   return (
     <div className="space-y-6">
       <PortfolioCards
-        stats={stats}
+        // Always show aggregated stats across all portfolios on the "All portfolios" card,
+        // regardless of which portfolio is selected.
+        stats={allStats}
         portfolios={portfolios}
         selectedPortfolioId={selectedPortfolioId}
         onSelectPortfolio={handleSelectPortfolio}
