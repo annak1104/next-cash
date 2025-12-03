@@ -22,16 +22,11 @@ export default async function IncomeTransactionPage() {
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link href="/dashboard">Dashboard</Link>
+              <Link href="/net-worth/budget">Budget</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link href="/dashboard/transactions">Transactions</Link>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
+
           <BreadcrumbItem>
             <BreadcrumbPage>Add income</BreadcrumbPage>
           </BreadcrumbItem>
@@ -45,4 +40,3 @@ export default async function IncomeTransactionPage() {
     </div>
   );
 }
-

@@ -25,9 +25,9 @@ export default async function RecentTransactions() {
             <Button asChild variant="outline">
               <Link href="/dashboard/transactions">View all</Link>
             </Button>
-            <Button asChild>
+            {/* <Button asChild>
               <Link href="/dashboard/transactions/new">Create new</Link>
-            </Button>
+            </Button> */}
           </div>
         </CardTitle>
       </CardHeader>

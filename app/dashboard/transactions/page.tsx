@@ -58,7 +58,7 @@ export default async function TransactionsPage({
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link href="/dashboard">Dashboard</Link>
+              <Link href="/net-worth/budget">Budget</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
@@ -77,9 +77,9 @@ export default async function TransactionsPage({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Button asChild>
+          {/* <Button asChild>
             <Link href="/dashboard/transactions/new">New transaction</Link>
-          </Button>
+          </Button> */}
           {!transactions?.length && (
             <p className="text-muted-foreground py-10 text-center text-lg">
               There are no transactions this month

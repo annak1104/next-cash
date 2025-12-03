@@ -29,7 +29,8 @@ export default function ExpenseTransactionForm({
       transactionDate: format(data.transactionDate, "yyyy-MM-dd"),
       categoryId: data.categoryId,
       walletId: data.walletId,
-      description: data.note || `Expense transaction - ${new Date().toLocaleDateString()}`,
+      description:
+        data.note || `Expense transaction - ${new Date().toLocaleDateString()}`,
     });
 
     if (result.error) {
@@ -38,9 +39,10 @@ export default function ExpenseTransactionForm({
     }
 
     toast.success("Expense transaction created");
-    router.push(
-      `/dashboard/transactions?month=${data.transactionDate.getMonth() + 1}&year=${data.transactionDate.getFullYear()}`,
-    );
+    // router.push(
+    //   `/dashboard/transactions?month=${data.transactionDate.getMonth() + 1}&year=${data.transactionDate.getFullYear()}`,
+    // );
+    router.push("/net-worth/budget");
   };
 
   const handleSaveAndAddMore = async (
@@ -51,7 +53,8 @@ export default function ExpenseTransactionForm({
       transactionDate: format(data.transactionDate, "yyyy-MM-dd"),
       categoryId: data.categoryId,
       walletId: data.walletId,
-      description: data.note || `Expense transaction - ${new Date().toLocaleDateString()}`,
+      description:
+        data.note || `Expense transaction - ${new Date().toLocaleDateString()}`,
     });
 
     if (result.error) {
@@ -73,4 +76,3 @@ export default function ExpenseTransactionForm({
     />
   );
 }
-
