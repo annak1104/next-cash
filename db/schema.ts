@@ -73,3 +73,24 @@ export const holdingsTable = pgTable("holdings", {
   currentPrice: numeric("current_price"), // Current market price (can be updated)
   coinGeckoId: text("coin_gecko_id"), // For crypto assets from CoinGecko API
 });
+
+export const tradesTable = pgTable("trades", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  userId: text("user_id").notNull(),
+  portfolioId: integer("portfolio_id")
+    .references(() => portfoliosTable.id)
+    .notNull(),
+  type: text({ enum: ["buy", "sell", "revaluation"] }).notNull(),
+  assetType: text({ enum: ["crypto", "stock"] }).notNull(),
+  symbol: text().notNull(), // BTC, ETH, AAPL, etc.
+  name: text().notNull(),
+  image: text(), // URL to asset image/logo
+  quantity: numeric().notNull(), // Amount of asset
+  price: numeric().notNull(), // Price per unit
+  fee: numeric("fee"), // Transaction fee
+  totalValue: numeric("total_value").notNull(), // quantity * price + fee
+  tradeDate: date("trade_date").notNull(),
+  coinGeckoId: text("coin_gecko_id"), // For crypto assets from CoinGecko API
+  entryType: text({ enum: ["single", "multiple"] }).notNull().default("single"),
+});
+

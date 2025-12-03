@@ -64,6 +64,9 @@ export default function RootLayout({
                         <NavigationMenuLink asChild>
                           <Link href="/dashboard">Dashboard</Link>
                         </NavigationMenuLink>
+                        <NavigationMenuLink asChild>
+                          <Link href="/dashboard/portfolio/trades">Trades</Link>
+                        </NavigationMenuLink>
                       </NavigationMenuContent>
                     </NavigationMenuItem>
                     <NavigationMenuItem>

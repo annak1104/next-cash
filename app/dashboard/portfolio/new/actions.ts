@@ -5,6 +5,7 @@ import {
   categoriesTable,
   holdingsTable,
   portfoliosTable,
+  tradesTable,
   transactionsTable,
   walletsTable,
 } from "@/db/schema";
@@ -66,6 +67,24 @@ export async function createAssetTrade(rawData: any) {
 
   const quantityDelta = data.type === "sell" ? -data.amount : data.amount;
   const tradeValue = data.amount * data.price + (data.fee ?? 0);
+
+  // Persist trade record for history / trades table
+  await db.insert(tradesTable).values({
+    userId,
+    portfolioId: data.portfolioId,
+    type: data.type,
+    assetType: data.assetType,
+    symbol: data.ticker,
+    name: data.tickerName ?? data.ticker,
+    image: data.tickerImage ?? null,
+    quantity: data.amount.toString(),
+    price: data.price.toString(),
+    fee: data.fee != null ? data.fee.toString() : null,
+    totalValue: tradeValue.toString(),
+    tradeDate: data.transactionDate.toISOString().slice(0, 10),
+    coinGeckoId: data.tickerId ?? null,
+    entryType: data.entryType,
+  });
 
   if (data.type === "revaluation") {
     // Only update prices, do not change quantity
