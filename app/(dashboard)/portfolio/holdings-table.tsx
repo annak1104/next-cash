@@ -12,14 +12,18 @@ function getAssetCategory(holding: HoldingRow): "crypto" | "stock" {
   const name = holding.name.toLowerCase();
   const symbol = holding.symbol.toLowerCase();
 
-  // Heuristics for tokenized / synthetic stocks coming from crypto APIs
-  // Examples from the UI: "NVIDIA (Ondo Tokenized Stock)", "Apple xStock"
-  if (
+  // Strong indicators that this is a stock (tokenized/synthetic stocks)
+  // Examples: "NVIDIA (Ondo Tokenized Stock)", "Apple xStock", "Nasdaq xStock"
+  const hasStockKeywords =
     name.includes("stock") ||
     name.includes("xstock") ||
-    name.includes("tokenized") ||
-    symbol.endsWith("x") // many synthetic stock tokens use X suffix
-  ) {
+    name.includes("tokenized");
+
+  // Symbols ending with X are stocks ONLY if combined with stock keywords in name
+  // This prevents false positives like TRX (TRON cryptocurrency) from being classified as stock
+  const isStockSymbol = symbol.endsWith("x") && hasStockKeywords;
+
+  if (hasStockKeywords || isStockSymbol) {
     return "stock";
   }
 
