@@ -43,13 +43,18 @@ export default function EditTransactionForm({
       `/transactions?month=${data.transactionDate.getMonth() + 1}&year=${data.transactionDate.getFullYear()}`,
     );
   };
+  const parsedAmount = Number(transaction.amount);
+  const amount = isNaN(parsedAmount) || parsedAmount <= 0 ? 0 : parsedAmount;
+
   return (
     <TransactionForm
       defaultValues={{
-        amount: Number(transaction.amount),
-        categoryId: transaction.categoryId,
-        description: transaction.description,
-        transactionDate: new Date(transaction.transactionDate),
+        amount,
+        categoryId: transaction.categoryId || 0,
+        description: transaction.description || "",
+        transactionDate: transaction.transactionDate
+          ? new Date(transaction.transactionDate)
+          : new Date(),
         transactionType:
           categories.find((category) => category.id === transaction.categoryId)
             ?.type ?? "income",

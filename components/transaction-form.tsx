@@ -126,8 +126,8 @@ export default function TransactionForm({
                   <FormLabel>Category</FormLabel>
                   <FormControl>
                     <Select
-                      onValueChange={field.onChange}
-                      value={field.value.toString()}
+                      onValueChange={(value) => field.onChange(Number(value))}
+                      value={field.value ? field.value.toString() : ""}
                     >
                       <SelectTrigger>
                         <SelectValue />
@@ -205,7 +205,19 @@ export default function TransactionForm({
                 <FormItem>
                   <FormLabel>Amount</FormLabel>
                   <FormControl>
-                    <Input {...field} type="number" />
+                    <Input
+                      type="number"
+                      step="any"
+                      value={field.value ?? ""}
+                      onChange={(e) =>
+                        field.onChange(
+                          e.target.value === ""
+                            ? 0
+                            : parseFloat(e.target.value) || 0,
+                        )
+                      }
+                      onBlur={field.onBlur}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

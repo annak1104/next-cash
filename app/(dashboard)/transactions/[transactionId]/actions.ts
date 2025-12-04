@@ -2,16 +2,22 @@
 
 import { db } from "@/db";
 import { transactionsTable } from "@/db/schema";
-import { transactionSchema } from "@/validation/transactionSchema";
 import { auth } from "@clerk/nextjs/server";
 import { and, eq } from "drizzle-orm";
+import { addDays, subYears } from "date-fns";
 import { z } from "zod";
 
-const updateTransactionSchema = transactionSchema.and(
-  z.object({
-    id: z.number(),
-  }),
-);
+// Update schema without walletId requirement (walletId is optional in DB)
+const updateTransactionSchema = z.object({
+  id: z.number(),
+  amount: z.number().positive("Amount must be greater than 0"),
+  description: z
+    .string()
+    .min(3, "Description must contain at least 3 characters")
+    .max(300, "Description must contain a maximum of 300 characters"),
+  categoryId: z.number().positive("Category ID is invalid"),
+  transactionDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format"),
+});
 
 export async function updateTransaction(data: {
   id: number;
