@@ -70,3 +70,4 @@ export async function getTrades(options?: {
     totalValue: Number(row.totalValue),
   })) as TradeRow[];
 }
+

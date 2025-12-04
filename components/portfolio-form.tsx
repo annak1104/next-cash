@@ -34,7 +34,7 @@ const currencies = [
 
 type Props = {
   onSubmit: (data: z.infer<typeof portfolioSchema>) => Promise<void>;
-  onCancel: () => void;
+  onCancel?: () => void;
   defaultValues?: {
     name: string;
     description?: string;
