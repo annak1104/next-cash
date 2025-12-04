@@ -1,8 +1,12 @@
 import { db } from "@/db";
-import { categoriesTable, transactionsTable } from "@/db/schema";
+import {
+  categoriesTable,
+  transactionsTable,
+  walletsTable,
+} from "@/db/schema";
 import { auth } from "@clerk/nextjs/server";
 import { format } from "date-fns";
-import { and, desc, eq, gte, lte } from "drizzle-orm";
+import { and, desc, eq, gte, inArray, lte } from "drizzle-orm";
 import "server-only";
 
 export async function getTransactionsByMonth({
@@ -27,7 +31,13 @@ export async function getTransactionsByMonth({
       amount: transactionsTable.amount,
       transactionDate: transactionsTable.transactionDate,
       category: categoriesTable.name,
-      transactionType: categoriesTable.type,
+      transactionType: transactionsTable.transactionType,
+      fee: transactionsTable.fee,
+      walletId: transactionsTable.walletId,
+      walletName: walletsTable.name,
+      walletCurrency: walletsTable.currency,
+      fromWalletId: transactionsTable.fromWalletId,
+      toWalletId: transactionsTable.toWalletId,
     })
     .from(transactionsTable)
     .where(
@@ -47,6 +57,39 @@ export async function getTransactionsByMonth({
     .leftJoin(
       categoriesTable,
       eq(transactionsTable.categoryId, categoriesTable.id),
+    )
+    .leftJoin(
+      walletsTable,
+      eq(transactionsTable.walletId, walletsTable.id),
     );
-  return transactions;
+
+  // Get unique wallet IDs for from/to wallets
+  const walletIds = new Set<number>();
+  transactions.forEach((tx) => {
+    if (tx.fromWalletId) walletIds.add(tx.fromWalletId);
+    if (tx.toWalletId) walletIds.add(tx.toWalletId);
+  });
+
+  // Fetch wallet names in a single query
+  const walletMap = new Map<number, string>();
+  if (walletIds.size > 0) {
+    const wallets = await db
+      .select({
+        id: walletsTable.id,
+        name: walletsTable.name,
+      })
+      .from(walletsTable)
+      .where(inArray(walletsTable.id, Array.from(walletIds)));
+
+    wallets.forEach((wallet) => {
+      walletMap.set(wallet.id, wallet.name);
+    });
+  }
+
+  // Add wallet names to transactions
+  return transactions.map((tx) => ({
+    ...tx,
+    fromWalletName: tx.fromWalletId ? walletMap.get(tx.fromWalletId) || null : null,
+    toWalletName: tx.toWalletId ? walletMap.get(tx.toWalletId) || null : null,
+  }));
 }

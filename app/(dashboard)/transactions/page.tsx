@@ -89,50 +89,118 @@ export default async function TransactionsPage({
             <Table className="mt-4">
               <TableHeader>
                 <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Description</TableHead>
                   <TableHead>Type</TableHead>
+                  <TableHead className="cursor-pointer">Date</TableHead>
                   <TableHead>Category</TableHead>
+                  <TableHead>Note</TableHead>
+                  <TableHead>From/To</TableHead>
                   <TableHead>Amount</TableHead>
-                  <TableHead />
+                  <TableHead>Fee</TableHead>
+                  <TableHead className="w-12" />
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {transactions.map((transaction) => (
-                  <TableRow key={transaction.id}>
-                    <TableCell>
-                      {format(transaction.transactionDate, "do MMM yyyy")}
-                    </TableCell>
-                    <TableCell>{transaction.description}</TableCell>
-                    <TableCell className="capitalize">
-                      <Badge
-                        className={
-                          transaction.transactionType === "income"
-                            ? "bg-lime-500"
-                            : "bg-orange-500"
-                        }
-                      >
-                        {transaction.transactionType}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{transaction.category}</TableCell>
-                    <TableCell>
-                      ${numeral(transaction.amount).format("0,0[.]00")}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        variant="outline"
-                        asChild
-                        size="icon"
-                        aria-label="edit transaction"
-                      >
-                        <Link href={`transactions/${transaction.id}`}>
-                          <Edit2Icon />
-                        </Link>
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {transactions.map((transaction) => {
+                  const transactionType =
+                    transaction.transactionType ||
+                    (transaction.category === "income" ? "income" : "expense");
+                  const isTransfer = transactionType === "transfer";
+                  const isAdjustment = transactionType === "adjustment";
+                  const isIncome = transactionType === "income";
+                  const isExpense = transactionType === "expense";
+
+                  // Badge color logic
+                  let badgeColor = "bg-orange-500"; // default expense
+                  if (isIncome) {
+                    badgeColor = "bg-lime-500";
+                  } else if (isTransfer || isAdjustment) {
+                    badgeColor = "bg-sky-500";
+                  }
+
+                  // Format amount with currency
+                  const currency = transaction.walletCurrency || "USD";
+                  const currencySymbol =
+                    currency === "USD"
+                      ? "$"
+                      : currency === "UAH"
+                        ? "₴"
+                        : currency === "EUR"
+                          ? "€"
+                          : currency === "GBP"
+                            ? "£"
+                            : "$";
+                  const amount = Number(transaction.amount);
+                  const formattedAmount = `${currencySymbol}${numeral(amount).format("0,0[.]00")}`;
+
+                  // Format fee
+                  const fee = transaction.fee ? Number(transaction.fee) : null;
+                  const formattedFee = fee
+                    ? `${currencySymbol}${numeral(fee).format("0,0[.]00")}`
+                    : "--";
+
+                  return (
+                    <TableRow key={transaction.id}>
+                      <TableCell>
+                        <Badge className={badgeColor}>
+                          {transactionType || "expense"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {format(
+                          new Date(transaction.transactionDate),
+                          "dd-MM-yyyy",
+                        )}
+                      </TableCell>
+                      <TableCell>{transaction.category || "--"}</TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {transaction.description || "--"}
+                      </TableCell>
+                      <TableCell>
+                        {isTransfer ? (
+                          <div className="flex flex-col gap-1 text-sm">
+                            {transaction.fromWalletName && (
+                              <span className="text-muted-foreground">
+                                from {transaction.fromWalletName}
+                              </span>
+                            )}
+                            {transaction.toWalletName && (
+                              <span>to {transaction.toWalletName}</span>
+                            )}
+                            {!transaction.fromWalletName &&
+                              !transaction.toWalletName && (
+                                <span className="text-muted-foreground">
+                                  --
+                                </span>
+                              )}
+                          </div>
+                        ) : transaction.walletName ? (
+                          <span>{transaction.walletName}</span>
+                        ) : (
+                          <span className="text-muted-foreground">--</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        {formattedAmount}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {formattedFee}
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          asChild
+                          size="icon"
+                          aria-label="edit transaction"
+                          className="h-8 w-8"
+                        >
+                          <Link href={`transactions/${transaction.id}`}>
+                            <Edit2Icon className="h-4 w-4" />
+                          </Link>
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           )}

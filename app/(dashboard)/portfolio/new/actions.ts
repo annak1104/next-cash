@@ -201,17 +201,47 @@ export async function createAssetTrade(rawData: any) {
     const isBuy = data.type === "buy";
     const amount = cashChangeBase;
 
-    // Pick a default expense or income category
-    const [category] = await db
-      .select()
-      .from(categoriesTable)
-      .where(
-        eq(
-          categoriesTable.type,
-          isBuy ? ("expense" as const) : ("income" as const),
-        ),
-      )
-      .limit(1);
+    // For buy transactions, use "Investments" category; for sell, use "Sale of assets"
+    let category;
+    if (isBuy) {
+      // Find "Investments" expense category
+      [category] = await db
+        .select()
+        .from(categoriesTable)
+        .where(
+          and(
+            eq(categoriesTable.type, "expense"),
+            eq(categoriesTable.name, "Investments"),
+          ),
+        )
+        .limit(1);
+    } else {
+      // Find "Sale of assets" income category
+      [category] = await db
+        .select()
+        .from(categoriesTable)
+        .where(
+          and(
+            eq(categoriesTable.type, "income"),
+            eq(categoriesTable.name, "Sale of assets"),
+          ),
+        )
+        .limit(1);
+    }
+
+    // Fallback to first available category if specific one not found
+    if (!category) {
+      [category] = await db
+        .select()
+        .from(categoriesTable)
+        .where(
+          eq(
+            categoriesTable.type,
+            isBuy ? ("expense" as const) : ("income" as const),
+          ),
+        )
+        .limit(1);
+    }
 
     if (!category) {
       return {
@@ -230,6 +260,7 @@ export async function createAssetTrade(rawData: any) {
         data.ticker
       } in portfolio ${portfolio.name}`,
       transactionType: isBuy ? "expense" : "income",
+      fee: data.fee != null ? data.fee.toString() : null,
     });
   }
 
