@@ -13,6 +13,7 @@ import {
   Search,
   SwitchCamera,
 } from "lucide-react";
+import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -90,7 +91,7 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
       price: 0,
       fee: undefined,
       entryType: "single",
-      updateCash: true,
+      updateCash: false,
       walletId: wallets[0]?.id,
       exchangeRate: 1,
     },
@@ -240,7 +241,7 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
             >
               Single entry
             </Button>
-            <Button
+            {/* <Button
               type="button"
               size="sm"
               variant={watchEntryType === "multiple" ? "default" : "ghost"}
@@ -251,7 +252,7 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
               onClick={() => form.setValue("entryType", "multiple")}
             >
               Multiple entry (no cash)
-            </Button>
+            </Button> */}
           </div>
 
           {/* Main grid */}
@@ -373,10 +374,12 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
                           {selectedCrypto ? (
                             <div className="flex items-center gap-2">
                               {selectedCrypto.image && (
-                                <img
+                                <Image
                                   src={selectedCrypto.image}
                                   alt={selectedCrypto.symbol}
                                   className="h-4 w-4 rounded-full"
+                                  width={26}
+                                  height={26}
                                 />
                               )}
                               <span>
@@ -424,10 +427,12 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
                                 >
                                   <div className="flex items-center gap-2">
                                     {coin.image && (
-                                      <img
+                                      <Image
                                         src={coin.image}
                                         alt={coin.symbol}
                                         className="h-5 w-5 rounded-full"
+                                        width={26}
+                                        height={26}
                                       />
                                     )}
                                     <div className="flex flex-col items-start">
