@@ -210,7 +210,7 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
       setSelectedCrypto(null);
       setApiPrice(null);
     } else {
-      router.push("portfolio");
+      router.push("/portfolio");
     }
   };
 

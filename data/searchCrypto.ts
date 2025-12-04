@@ -2,30 +2,11 @@
 
 const COINGECKO_API = "https://api.coingecko.com/api/v3";
 
-let searchCache: {
-  data: Array<{ id: string; symbol: string; name: string; image: string }>;
-  timestamp: number;
-} | null = null;
-
-const CACHE_LIFETIME = 1000 * 60 * 15; // 15 minutes
-
 export async function searchCrypto(
   query: string,
 ): Promise<Array<{ id: string; symbol: string; name: string; image: string }>> {
   if (!query || query.length < 1) {
     return [];
-  }
-
-  const now = Date.now();
-
-  // Use cache if available and query is short
-  if (searchCache && now - searchCache.timestamp < CACHE_LIFETIME) {
-    const lower = query.toLowerCase();
-    return searchCache.data.filter(
-      (coin) =>
-        coin.symbol.toLowerCase().includes(lower) ||
-        coin.name.toLowerCase().includes(lower),
-    );
   }
 
   try {
@@ -48,13 +29,13 @@ export async function searchCrypto(
         image: coin.thumb as string,
       })) ?? [];
 
-    searchCache = { data: coins, timestamp: now };
     return coins;
   } catch (error) {
     console.error("CoinGecko search error:", error);
     return [];
   }
 }
+
 
 
 
