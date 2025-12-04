@@ -29,7 +29,7 @@ export default function NewTransactionForm({
     }
     toast.success("Transaction created");
     router.push(
-      `/dashboard/transactions?month=${data.transactionDate.getMonth() + 1}&year${data.transactionDate.getFullYear()}`,
+      `transactions?month=${data.transactionDate.getMonth() + 1}&year${data.transactionDate.getFullYear()}`,
     );
     console.log(result.id);
   };

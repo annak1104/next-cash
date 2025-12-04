@@ -23,10 +23,10 @@ export default async function RecentTransactions() {
           <span>Recent transactions</span>
           <div className="flex gap-2">
             <Button asChild variant="outline">
-              <Link href="/dashboard/transactions">View all</Link>
+              <Link href="/transactions">View all</Link>
             </Button>
             {/* <Button asChild>
-              <Link href="/dashboard/transactions/new">Create new</Link>
+              <Link href="/transactions/new">Create new</Link>
             </Button> */}
           </div>
         </CardTitle>

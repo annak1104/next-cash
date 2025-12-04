@@ -6,31 +6,37 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
+import NewPortfolioForm from "./new-portfolio-form";
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default function NewPortfolioPage() {
   return (
     <div className="mx-auto max-w-7xl px-1 py-10">
       <Breadcrumb>
         <BreadcrumbList>
+          {/* <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link href="/dashboard">Dashboard</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator /> */}
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link href="/net-worth/budget">Budget</Link>
+              <Link href="/portfolio">Portfolio</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link href="/dashboard/transactions">Transactions</Link>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>Edit transaction</BreadcrumbPage>
+            <BreadcrumbPage>New portfolio</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      {children}
+      <Card className="mt-4 max-w-3xl">
+        <CardContent className="pt-6">
+          <NewPortfolioForm />
+        </CardContent>
+      </Card>
     </div>
   );
 }

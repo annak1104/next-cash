@@ -35,7 +35,7 @@ export default function UserDropdown() {
         <UserButton.Action
           label="Dashboard"
           labelIcon={<ChartColumnBigIcon size={16} />}
-          onClick={() => router.push("/dashboard")}
+          onClick={() => router.push("/portfolio")}
         />
       </UserButton.MenuItems>
     </UserButton>

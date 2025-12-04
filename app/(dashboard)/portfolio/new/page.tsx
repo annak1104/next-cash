@@ -6,48 +6,41 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 
 import getPortfolios from "@/data/getPortfolios";
-import { getTrades } from "@/data/getTrades";
-import TradesTable from "./trades-table";
+import getWallets from "@/data/getWallets";
+import NewTradeForm from "./new-trade-form";
 
-export default async function TradesPage() {
+export default async function AddNewCurrencyPage() {
   const portfolios = await getPortfolios();
-  const trades = await getTrades();
+  const wallets = await getWallets();
 
   return (
     <div className="mx-auto max-w-7xl px-1 py-10">
       <Breadcrumb>
         <BreadcrumbList>
-          <BreadcrumbItem>
+          {/* <BreadcrumbItem>
             <BreadcrumbLink asChild>
               <Link href="/dashboard">Dashboard</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
-          <BreadcrumbSeparator />
+          <BreadcrumbSeparator /> */}
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link href="/dashboard/portfolio">Portfolio</Link>
+              <Link href="/portfolio">Portfolio</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>Trades</BreadcrumbPage>
+            <BreadcrumbPage>Add new buy transaction</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-
-      <Card className="mt-4">
-        <CardHeader>
-          <CardTitle>Portfolio trades</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <TradesTable
-            portfolios={portfolios.map((p) => ({ id: p.id, name: p.name }))}
-            initialTrades={trades}
-          />
+      <Card className="mt-4 max-w-4xl">
+        <CardContent className="pt-6">
+          <NewTradeForm portfolios={portfolios} wallets={wallets} />
         </CardContent>
       </Card>
     </div>

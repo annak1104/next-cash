@@ -1,11 +1,11 @@
 "use client";
 
 import PortfolioForm from "@/components/portfolio-form";
-import { createPortfolio } from "../actions";
-import { z } from "zod";
 import { portfolioSchema } from "@/validation/portfolioSchema";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { z } from "zod";
+import { createPortfolio } from "../actions";
 
 export default function NewPortfolioForm() {
   const router = useRouter();
@@ -17,9 +17,8 @@ export default function NewPortfolioForm() {
       return;
     }
     toast.success("Portfolio created successfully");
-    router.push("/dashboard/portfolio");
+    router.push("portfolio");
   }
 
   return <PortfolioForm onSubmit={handleSubmit} />;
 }
-

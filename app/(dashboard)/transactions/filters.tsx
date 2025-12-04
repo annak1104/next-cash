@@ -54,9 +54,7 @@ export default function Filters({ month, year, yearsRange }: Props) {
         </SelectContent>
       </Select>
       <Button asChild>
-        <Link
-          href={`/dashboard/transactions?year=${selectedYear}&month=${selectedMonth}`}
-        >
+        <Link href={`transactions?year=${selectedYear}&month=${selectedMonth}`}>
           Go
         </Link>
       </Button>

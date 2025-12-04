@@ -13,7 +13,7 @@ export default function Home() {
         <p className="text-2xl">Track your finances with ease</p>
         <SignedIn>
           <Button asChild size="lg">
-            <Link href="/dashboard">Go To Your Dashboard</Link>
+            <Link href="/portfolio">Go To Your Dashboard</Link>
           </Button>
         </SignedIn>
         <SignedOut>

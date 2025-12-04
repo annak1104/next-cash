@@ -22,25 +22,25 @@ export default async function WalletsSection() {
       <TotalBalance totalBalance={totalBalance} />
       <div className="flex gap-1">
         <Button asChild>
-          <Link href="/dashboard/transactions/income">
+          <Link href="/transactions/income">
             <ArrowDown />
             Income
           </Link>
         </Button>
         <Button variant="outline" asChild>
-          <Link href="/dashboard/transactions/expense">
+          <Link href="/transactions/expense">
             <ArrowUp />
             Expense
           </Link>
         </Button>
         <Button variant="outline" asChild>
-          <Link href="/dashboard/transactions/transfer">
+          <Link href="/transactions/transfer">
             <ArrowsUpFromLine />
             Transfers
           </Link>
         </Button>
         <Button variant="outline" asChild>
-          <Link href="/dashboard/transactions/adjustment">
+          <Link href="/transactions/adjustment">
             <Calculator />
             Adjustment
           </Link>

@@ -1,10 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm } from "react-hook-form";
 import { format } from "date-fns";
 import {
   ArrowLeft,
@@ -14,6 +10,10 @@ import {
   SwitchCamera,
 } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -26,7 +26,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Select,
   SelectContent,
@@ -34,12 +39,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { tradeSchema } from "@/validation/tradeSchema";
-import { createAssetTrade } from "./actions";
 import { toast } from "sonner";
+import { createAssetTrade } from "./actions";
 
 type Portfolio = {
   id: string;
@@ -72,7 +76,9 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
   const [cryptoOptions, setCryptoOptions] = useState<CryptoOption[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCrypto, setSelectedCrypto] = useState<CryptoOption | null>(null);
+  const [selectedCrypto, setSelectedCrypto] = useState<CryptoOption | null>(
+    null,
+  );
   const [isTickerPopoverOpen, setIsTickerPopoverOpen] = useState(false);
   const [apiPrice, setApiPrice] = useState<number | null>(null);
 
@@ -204,7 +210,7 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
       setSelectedCrypto(null);
       setApiPrice(null);
     } else {
-      router.push("/dashboard/portfolio");
+      router.push("portfolio");
     }
   };
 
@@ -228,7 +234,7 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
           className="space-y-6"
         >
           {/* Entry type toggle */}
-          <div className="inline-flex rounded-full bg-muted p-1 text-xs">
+          <div className="bg-muted inline-flex rounded-full p-1 text-xs">
             <Button
               type="button"
               size="sm"
@@ -256,7 +262,7 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
           </div>
 
           {/* Main grid */}
-          <div className="space-y-4 rounded-2xl border bg-background p-4 sm:p-6">
+          <div className="bg-background space-y-4 rounded-2xl border p-4 sm:p-6">
             {/* Type */}
             <FormField
               control={form.control}
@@ -265,10 +271,7 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
                 <FormItem>
                   <FormLabel>Type</FormLabel>
                   <FormControl>
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value}
-                    >
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -408,11 +411,11 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
                         </div>
                         <ScrollArea className="h-[280px]">
                           {isSearching ? (
-                            <div className="p-4 text-center text-sm text-muted-foreground">
+                            <div className="text-muted-foreground p-4 text-center text-sm">
                               Searching…
                             </div>
                           ) : cryptoOptions.length === 0 ? (
-                            <div className="p-4 text-center text-sm text-muted-foreground">
+                            <div className="text-muted-foreground p-4 text-center text-sm">
                               Start typing to search
                             </div>
                           ) : (
@@ -439,7 +442,7 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
                                       <span className="font-medium">
                                         {coin.symbol}
                                       </span>
-                                      <span className="text-xs text-muted-foreground">
+                                      <span className="text-muted-foreground text-xs">
                                         {coin.name}
                                       </span>
                                     </div>
@@ -510,7 +513,7 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
                     </div>
                   </FormControl>
                   {apiPrice && (
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-muted-foreground text-xs">
                       Price ${apiPrice.toFixed(2)}
                     </p>
                   )}
@@ -547,11 +550,11 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
           </div>
 
           {/* Cash section */}
-          <div className="space-y-4 rounded-2xl border bg-background p-4 sm:p-6">
+          <div className="bg-background space-y-4 rounded-2xl border p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">Update cash balance</p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-muted-foreground text-xs">
                   When enabled, the corresponding cash account will be updated.
                 </p>
               </div>
@@ -561,10 +564,13 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
                 render={({ field }) => (
                   <Switch
                     checked={
-                      field.value && watchEntryType === "single" && watchType !== "revaluation"
+                      field.value &&
+                      watchEntryType === "single" &&
+                      watchType !== "revaluation"
                     }
                     disabled={
-                      watchEntryType === "multiple" || watchType === "revaluation"
+                      watchEntryType === "multiple" ||
+                      watchType === "revaluation"
                     }
                     onCheckedChange={(checked) => field.onChange(checked)}
                   />
@@ -572,63 +578,65 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
               />
             </div>
 
-            {watchUpdateCash && watchEntryType === "single" && watchType !== "revaluation" && (
-              <div className="grid gap-4 md:grid-cols-2">
-                {/* Wallet */}
-                <FormField
-                  control={form.control}
-                  name="walletId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Cash account</FormLabel>
-                      <FormControl>
-                        <Select
-                          onValueChange={(val) => field.onChange(Number(val))}
-                          value={field.value ? String(field.value) : ""}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select cash account" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {wallets.map((w) => (
-                              <SelectItem key={w.id} value={String(w.id)}>
-                                {w.name} : {w.currency}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+            {watchUpdateCash &&
+              watchEntryType === "single" &&
+              watchType !== "revaluation" && (
+                <div className="grid gap-4 md:grid-cols-2">
+                  {/* Wallet */}
+                  <FormField
+                    control={form.control}
+                    name="walletId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Cash account</FormLabel>
+                        <FormControl>
+                          <Select
+                            onValueChange={(val) => field.onChange(Number(val))}
+                            value={field.value ? String(field.value) : ""}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select cash account" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {wallets.map((w) => (
+                                <SelectItem key={w.id} value={String(w.id)}>
+                                  {w.name} : {w.currency}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                {/* Exchange rate */}
-                <FormField
-                  control={form.control}
-                  name="exchangeRate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Exchange rate</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          step="any"
-                          {...field}
-                          onChange={(e) =>
-                            field.onChange(parseFloat(e.target.value) || 1)
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            )}
+                  {/* Exchange rate */}
+                  <FormField
+                    control={form.control}
+                    name="exchangeRate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Exchange rate</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            step="any"
+                            {...field}
+                            onChange={(e) =>
+                              field.onChange(parseFloat(e.target.value) || 1)
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              )}
 
             {watchUpdateCash && (
-              <p className="text-xs text-muted-foreground">
+              <p className="text-muted-foreground text-xs">
                 Currency rate:{" "}
                 <span className="underline">
                   {watchExchangeRate ? watchExchangeRate.toFixed(3) : "—"}
@@ -639,7 +647,7 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
 
           {/* Summary + buttons */}
           <div className="flex flex-col items-end gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="text-right text-sm text-muted-foreground sm:text-left">
+            <div className="text-muted-foreground text-right text-sm sm:text-left">
               <div>
                 Total amount:{" "}
                 <span className="font-semibold">
@@ -651,9 +659,7 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
                   Cash balance change:{" "}
                   <span className="font-semibold">
                     {watchType === "buy" ? "-" : "+"}
-                    {Number.isFinite(cashChange)
-                      ? cashChange.toFixed(2)
-                      : "0"}
+                    {Number.isFinite(cashChange) ? cashChange.toFixed(2) : "0"}
                   </span>
                 </div>
               )}
@@ -680,5 +686,3 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
     </div>
   );
 }
-
-

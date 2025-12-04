@@ -78,7 +78,7 @@ export default async function TransactionsPage({
         </CardHeader>
         <CardContent>
           {/* <Button asChild>
-            <Link href="/dashboard/transactions/new">New transaction</Link>
+            <Link href="/transactions/new">New transaction</Link>
           </Button> */}
           {!transactions?.length && (
             <p className="text-muted-foreground py-10 text-center text-lg">
@@ -126,9 +126,7 @@ export default async function TransactionsPage({
                         size="icon"
                         aria-label="edit transaction"
                       >
-                        <Link
-                          href={`/dashboard/transactions/${transaction.id}`}
-                        >
+                        <Link href={`transactions/${transaction.id}`}>
                           <Edit2Icon />
                         </Link>
                       </Button>

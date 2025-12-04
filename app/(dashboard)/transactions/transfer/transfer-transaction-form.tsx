@@ -31,7 +31,9 @@ export default function TransferTransactionForm({
       fromWalletId: data.fromWalletId,
       toWalletId: data.toWalletId,
       fee: data.fee,
-      description: data.note || `Transfer transaction - ${new Date().toLocaleDateString()}`,
+      description:
+        data.note ||
+        `Transfer transaction - ${new Date().toLocaleDateString()}`,
     });
 
     if (result.error) {
@@ -41,7 +43,7 @@ export default function TransferTransactionForm({
 
     toast.success("Transfer transaction created");
     // router.push(
-    //   `/dashboard/transactions?month=${data.transactionDate.getMonth() + 1}&year=${data.transactionDate.getFullYear()}`,
+    //   `transactions?month=${data.transactionDate.getMonth() + 1}&year=${data.transactionDate.getFullYear()}`,
     // );
     router.push("/net-worth/budget");
   };
@@ -56,7 +58,9 @@ export default function TransferTransactionForm({
       fromWalletId: data.fromWalletId,
       toWalletId: data.toWalletId,
       fee: data.fee,
-      description: data.note || `Transfer transaction - ${new Date().toLocaleDateString()}`,
+      description:
+        data.note ||
+        `Transfer transaction - ${new Date().toLocaleDateString()}`,
     });
 
     if (result.error) {
@@ -78,4 +82,3 @@ export default function TransferTransactionForm({
     />
   );
 }
-

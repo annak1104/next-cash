@@ -6,43 +6,31 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 
-import getPortfolios from "@/data/getPortfolios";
-import getWallets from "@/data/getWallets";
-import NewTradeForm from "./new-trade-form";
-
-export default async function AddNewCurrencyPage() {
-  const portfolios = await getPortfolios();
-  const wallets = await getWallets();
-
+export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="mx-auto max-w-7xl px-1 py-10">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link href="/dashboard">Dashboard</Link>
+              <Link href="/net-worth/budget">Budget</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link href="/dashboard/portfolio">Portfolio</Link>
+              <Link href="/transactions">Transactions</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>Add new buy transaction</BreadcrumbPage>
+            <BreadcrumbPage>Edit transaction</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <Card className="mt-4 max-w-4xl">
-        <CardContent className="pt-6">
-          <NewTradeForm portfolios={portfolios} wallets={wallets} />
-        </CardContent>
-      </Card>
+      {children}
     </div>
   );
 }

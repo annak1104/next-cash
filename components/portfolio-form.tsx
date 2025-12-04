@@ -139,7 +139,7 @@ export default function PortfolioForm({ onSubmit, defaultValues }: Props) {
             <Button
               type="button"
               variant="outline"
-              onClick={() => router.push("/dashboard/portfolio")}
+              onClick={() => router.push("portfolio")}
             >
               Cancel
             </Button>

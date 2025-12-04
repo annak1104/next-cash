@@ -23,14 +23,13 @@ export default function AdjustmentTransactionForm({
 }) {
   const router = useRouter();
 
-  const handleSubmit = async (
-    data: z.infer<typeof adjustmentFormSchema>,
-  ) => {
+  const handleSubmit = async (data: z.infer<typeof adjustmentFormSchema>) => {
     const result = await createAdjustmentTransaction({
       transactionDate: format(data.transactionDate, "yyyy-MM-dd"),
       walletId: data.walletId,
       newBalance: data.newBalance,
-      description: data.note || `Balance adjustment - ${new Date().toLocaleDateString()}`,
+      description:
+        data.note || `Balance adjustment - ${new Date().toLocaleDateString()}`,
     });
 
     if (result.error) {
@@ -45,7 +44,7 @@ export default function AdjustmentTransactionForm({
 
     toast.success("Adjustment transaction created");
     // router.push(
-    //   `/dashboard/transactions?month=${data.transactionDate.getMonth() + 1}&year=${data.transactionDate.getFullYear()}`,
+    //   `transactions?month=${data.transactionDate.getMonth() + 1}&year=${data.transactionDate.getFullYear()}`,
     // );
     router.push("/net-worth/budget");
   };
@@ -57,7 +56,8 @@ export default function AdjustmentTransactionForm({
       transactionDate: format(data.transactionDate, "yyyy-MM-dd"),
       walletId: data.walletId,
       newBalance: data.newBalance,
-      description: data.note || `Balance adjustment - ${new Date().toLocaleDateString()}`,
+      description:
+        data.note || `Balance adjustment - ${new Date().toLocaleDateString()}`,
     });
 
     if (result.error) {
@@ -83,4 +83,3 @@ export default function AdjustmentTransactionForm({
     />
   );
 }
-

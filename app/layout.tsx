@@ -51,7 +51,7 @@ export default function RootLayout({
             <nav className="bg-background flex h-16 items-center justify-between border-b p-4 text-white">
               <Link
                 href="/"
-                className="flex text-primary items-center gap-1 text-2xl font-bold"
+                className="text-primary flex items-center gap-1 text-2xl font-bold"
               >
                 <ChartColumnBigIcon className="text-lime-500" /> NextCash
               </Link>
@@ -64,10 +64,10 @@ export default function RootLayout({
                       </NavigationMenuTrigger>
                       <NavigationMenuContent>
                         <NavigationMenuLink asChild>
-                          <Link href="/dashboard">Dashboard</Link>
+                          <Link href="/portfolio">Dashboard</Link>
                         </NavigationMenuLink>
                         <NavigationMenuLink asChild>
-                          <Link href="/dashboard/portfolio/trades">Trades</Link>
+                          <Link href="portfolio/trades">Trades</Link>
                         </NavigationMenuLink>
                       </NavigationMenuContent>
                     </NavigationMenuItem>

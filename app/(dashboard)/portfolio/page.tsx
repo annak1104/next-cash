@@ -1,9 +1,9 @@
 import { Button } from "@/components/ui/button";
+import { getPortfolioHoldings } from "@/data/getPortfolioHoldings";
+import getPortfolios from "@/data/getPortfolios";
 import { PlusIcon } from "lucide-react";
 import Link from "next/link";
 import CreatePortfolioButton from "./create-portfolio-button";
-import getPortfolios from "@/data/getPortfolios";
-import { getPortfolioHoldings } from "@/data/getPortfolioHoldings";
 import PortfolioHoldingsSection from "./portfolio-holdings-section";
 
 export default async function PortfolioPage() {
@@ -16,7 +16,7 @@ export default async function PortfolioPage() {
         <h1 className="text-2xl font-semibold">Holdings</h1>
         <div className="flex gap-2">
           <Button asChild variant="outline">
-            <Link href="/dashboard/portfolio/new">
+            <Link href="portfolio/new">
               <PlusIcon className="mr-2 h-4 w-4" />
               Trades
             </Link>

@@ -35,7 +35,7 @@ export function DeleteTransactionDialog({
 
     const [year, month] = transactionDate.split("_");
     toast.success("Transaction deleted");
-    router.push(`/dashboard/transactions?month${month}&year${year}`);
+    router.push(`/transactions?month${month}&year${year}`);
   };
   return (
     <AlertDialog>

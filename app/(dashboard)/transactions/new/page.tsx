@@ -6,38 +6,42 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getCategories } from "@/data/getCategories";
 import Link from "next/link";
-import NewPortfolioForm from "./new-portfolio-form";
+import NewTransactionForm from "./new-transaction-form";
 
-export default function NewPortfolioPage() {
+export default async function NewTransactionPage() {
+  const categories = await getCategories();
   return (
     <div className="mx-auto max-w-7xl px-1 py-10">
       <Breadcrumb>
         <BreadcrumbList>
-          <BreadcrumbItem>
+          {/* <BreadcrumbItem>
             <BreadcrumbLink asChild>
               <Link href="/dashboard">Dashboard</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
-          <BreadcrumbSeparator />
+          <BreadcrumbSeparator /> */}
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link href="/dashboard/portfolio">Portfolio</Link>
+              <Link href="/transactions">Transactions</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>New portfolio</BreadcrumbPage>
+            <BreadcrumbPage>New transactions</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
       <Card className="mt-4 max-w-3xl">
-        <CardContent className="pt-6">
-          <NewPortfolioForm />
+        <CardHeader>
+          <CardTitle>New Transaction</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <NewTransactionForm categories={categories} />
         </CardContent>
       </Card>
     </div>
   );
 }
-

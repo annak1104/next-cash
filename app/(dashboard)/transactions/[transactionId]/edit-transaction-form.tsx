@@ -40,7 +40,7 @@ export default function EditTransactionForm({
     }
     toast.success("Transaction updated");
     router.push(
-      `/dashboard/transactions?month=${data.transactionDate.getMonth() + 1}&year${data.transactionDate.getFullYear()}`,
+      `transactions?month=${data.transactionDate.getMonth() + 1}&year${data.transactionDate.getFullYear()}`,
     );
   };
   return (

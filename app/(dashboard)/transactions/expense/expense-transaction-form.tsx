@@ -40,7 +40,7 @@ export default function ExpenseTransactionForm({
 
     toast.success("Expense transaction created");
     // router.push(
-    //   `/dashboard/transactions?month=${data.transactionDate.getMonth() + 1}&year=${data.transactionDate.getFullYear()}`,
+    //   `transactions?month=${data.transactionDate.getMonth() + 1}&year=${data.transactionDate.getFullYear()}`,
     // );
     router.push("/net-worth/budget");
   };
