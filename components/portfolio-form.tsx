@@ -34,6 +34,7 @@ const currencies = [
 
 type Props = {
   onSubmit: (data: z.infer<typeof portfolioSchema>) => Promise<void>;
+  onCancel: () => void;
   defaultValues?: {
     name: string;
     description?: string;
@@ -41,7 +42,11 @@ type Props = {
   };
 };
 
-export default function PortfolioForm({ onSubmit, defaultValues }: Props) {
+export default function PortfolioForm({
+  onSubmit,
+  onCancel,
+  defaultValues,
+}: Props) {
   const router = useRouter();
 
   const form = useForm<z.infer<typeof portfolioSchema>>({
@@ -136,11 +141,7 @@ export default function PortfolioForm({ onSubmit, defaultValues }: Props) {
 
           {/* Action buttons */}
           <div className="flex justify-end gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => router.push("portfolio")}
-            >
+            <Button type="button" variant="outline" onClick={onCancel}>
               Cancel
             </Button>
             <Button type="submit" disabled={form.formState.isSubmitting}>

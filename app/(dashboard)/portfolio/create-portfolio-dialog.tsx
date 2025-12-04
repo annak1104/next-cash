@@ -44,7 +44,7 @@ export default function CreatePortfolioDialog({ open, onOpenChange }: Props) {
         <DialogHeader>
           <DialogTitle>Create new portfolio</DialogTitle>
         </DialogHeader>
-        <PortfolioForm onSubmit={handleSubmit} />
+        <PortfolioForm onCancel={() => onOpenChange(false)} onSubmit={handleSubmit} />
       </DialogContent>
     </Dialog>
   );
