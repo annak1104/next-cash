@@ -110,6 +110,7 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
   const watchUpdateCash = form.watch("updateCash");
   const watchType = form.watch("type");
   const watchEntryType = form.watch("entryType");
+  const watchAssetType = form.watch("assetType");
 
   const totalAmount = useMemo(
     () => watchAmount * watchPrice + (watchFee || 0),
@@ -127,6 +128,18 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
       form.setValue("updateCash", false);
     }
   }, [watchEntryType, watchUpdateCash, form]);
+
+  // When switching to stocks, clear crypto-specific fields
+  useEffect(() => {
+    if (watchAssetType === "stock") {
+      setSelectedCrypto(null);
+      setSearchQuery("");
+      setApiPrice(null);
+      form.setValue("tickerId", undefined);
+      form.setValue("tickerName", undefined);
+      form.setValue("tickerImage", undefined);
+    }
+  }, [watchAssetType, form]);
 
   // Search crypto
   useEffect(() => {
@@ -263,6 +276,45 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
 
           {/* Main grid */}
           <div className="bg-background space-y-4 rounded-2xl border p-4 sm:p-6">
+            {/* Asset type */}
+            <FormField
+              control={form.control}
+              name="assetType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Asset type</FormLabel>
+                  <FormControl>
+                    <div className="bg-muted inline-flex rounded-full p-1 text-xs">
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant={field.value === "crypto" ? "default" : "ghost"}
+                        className={cn(
+                          "rounded-full px-4",
+                          field.value === "crypto" && "shadow-sm",
+                        )}
+                        onClick={() => field.onChange("crypto")}
+                      >
+                        Crypto
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant={field.value === "stock" ? "default" : "ghost"}
+                        className={cn(
+                          "rounded-full px-4",
+                          field.value === "stock" && "shadow-sm",
+                        )}
+                        onClick={() => field.onChange("stock")}
+                      >
+                        Stock
+                      </Button>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             {/* Type */}
             <FormField
               control={form.control}
@@ -363,97 +415,104 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
                 <FormItem>
                   <FormLabel>Ticker</FormLabel>
                   <FormControl>
-                    <Popover
-                      open={isTickerPopoverOpen}
-                      onOpenChange={setIsTickerPopoverOpen}
-                    >
-                      <PopoverTrigger asChild>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          role="combobox"
-                          className="w-full justify-between"
-                        >
-                          {selectedCrypto ? (
-                            <div className="flex items-center gap-2">
-                              {selectedCrypto.image && (
-                                <Image
-                                  src={selectedCrypto.image}
-                                  alt={selectedCrypto.symbol}
-                                  className="h-4 w-4 rounded-full"
-                                  width={26}
-                                  height={26}
-                                />
-                              )}
-                              <span>
-                                {selectedCrypto.symbol} — {selectedCrypto.name}
+                    {watchAssetType === "crypto" ? (
+                      <Popover
+                        open={isTickerPopoverOpen}
+                        onOpenChange={setIsTickerPopoverOpen}
+                      >
+                        <PopoverTrigger asChild>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            role="combobox"
+                            className="w-full justify-between"
+                          >
+                            {selectedCrypto ? (
+                              <div className="flex items-center gap-2">
+                                {selectedCrypto.image && (
+                                  <Image
+                                    src={selectedCrypto.image}
+                                    alt={selectedCrypto.symbol}
+                                    className="h-4 w-4 rounded-full"
+                                    width={26}
+                                    height={26}
+                                  />
+                                )}
+                                <span>
+                                  {selectedCrypto.symbol} — {selectedCrypto.name}
+                                </span>
+                              </div>
+                            ) : field.value ? (
+                              field.value
+                            ) : (
+                              <span className="text-muted-foreground">
+                                Search cryptocurrency…
                               </span>
-                            </div>
-                          ) : field.value ? (
-                            field.value
-                          ) : (
-                            <span className="text-muted-foreground">
-                              Search cryptocurrency…
-                            </span>
-                          )}
-                          <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-[420px] p-0">
-                        <div className="flex items-center border-b px-3">
-                          <Search className="mr-2 h-4 w-4 opacity-50" />
-                          <Input
-                            placeholder="Search crypto…"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="border-0 focus-visible:ring-0"
-                          />
-                        </div>
-                        <ScrollArea className="h-[280px]">
-                          {isSearching ? (
-                            <div className="text-muted-foreground p-4 text-center text-sm">
-                              Searching…
-                            </div>
-                          ) : cryptoOptions.length === 0 ? (
-                            <div className="text-muted-foreground p-4 text-center text-sm">
-                              Start typing to search
-                            </div>
-                          ) : (
-                            <div className="p-1">
-                              {cryptoOptions.map((coin) => (
-                                <Button
-                                  key={coin.id}
-                                  type="button"
-                                  variant="ghost"
-                                  className="w-full justify-start"
-                                  onClick={() => handleCryptoSelect(coin)}
-                                >
-                                  <div className="flex items-center gap-2">
-                                    {coin.image && (
-                                      <Image
-                                        src={coin.image}
-                                        alt={coin.symbol}
-                                        className="h-5 w-5 rounded-full"
-                                        width={26}
-                                        height={26}
-                                      />
-                                    )}
-                                    <div className="flex flex-col items-start">
-                                      <span className="font-medium">
-                                        {coin.symbol}
-                                      </span>
-                                      <span className="text-muted-foreground text-xs">
-                                        {coin.name}
-                                      </span>
+                            )}
+                            <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[420px] p-0">
+                          <div className="flex items-center border-b px-3">
+                            <Search className="mr-2 h-4 w-4 opacity-50" />
+                            <Input
+                              placeholder="Search crypto…"
+                              value={searchQuery}
+                              onChange={(e) => setSearchQuery(e.target.value)}
+                              className="border-0 focus-visible:ring-0"
+                            />
+                          </div>
+                          <ScrollArea className="h-[280px]">
+                            {isSearching ? (
+                              <div className="text-muted-foreground p-4 text-center text-sm">
+                                Searching…
+                              </div>
+                            ) : cryptoOptions.length === 0 ? (
+                              <div className="text-muted-foreground p-4 text-center text-sm">
+                                Start typing to search
+                              </div>
+                            ) : (
+                              <div className="p-1">
+                                {cryptoOptions.map((coin) => (
+                                  <Button
+                                    key={coin.id}
+                                    type="button"
+                                    variant="ghost"
+                                    className="w-full justify-start"
+                                    onClick={() => handleCryptoSelect(coin)}
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      {coin.image && (
+                                        <Image
+                                          src={coin.image}
+                                          alt={coin.symbol}
+                                          className="h-5 w-5 rounded-full"
+                                          width={26}
+                                          height={26}
+                                        />
+                                      )}
+                                      <div className="flex flex-col items-start">
+                                        <span className="font-medium">
+                                          {coin.symbol}
+                                        </span>
+                                        <span className="text-muted-foreground text-xs">
+                                          {coin.name}
+                                        </span>
+                                      </div>
                                     </div>
-                                  </div>
-                                </Button>
-                              ))}
-                            </div>
-                          )}
-                        </ScrollArea>
-                      </PopoverContent>
-                    </Popover>
+                                  </Button>
+                                ))}
+                              </div>
+                            )}
+                          </ScrollArea>
+                        </PopoverContent>
+                      </Popover>
+                    ) : (
+                      <Input
+                        placeholder="Enter stock ticker (e.g. NVDA)"
+                        {...field}
+                      />
+                    )}
                   </FormControl>
                   <FormMessage />
                 </FormItem>
