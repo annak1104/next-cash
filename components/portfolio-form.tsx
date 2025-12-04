@@ -1,7 +1,9 @@
 "use client";
 
+import { portfolioSchema } from "@/validation/portfolioSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Resolver, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "./ui/button";
@@ -22,8 +24,6 @@ import {
   SelectValue,
 } from "./ui/select";
 import { Textarea } from "./ui/textarea";
-import { useRouter } from "next/navigation";
-import { portfolioSchema } from "@/validation/portfolioSchema";
 
 const currencies = [
   { value: "USD", label: "USD - US Dollar" },
@@ -139,7 +139,7 @@ export default function PortfolioForm({ onSubmit, defaultValues }: Props) {
             <Button
               type="button"
               variant="outline"
-              onClick={() => router.back()}
+              onClick={() => router.push("/dashboard/portfolio")}
             >
               Cancel
             </Button>
@@ -152,4 +152,3 @@ export default function PortfolioForm({ onSubmit, defaultValues }: Props) {
     </Form>
   );
 }
-

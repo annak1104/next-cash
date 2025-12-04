@@ -5,7 +5,7 @@ const COINGECKO_API = "https://api.coingecko.com/api/v3";
 
 let cached: HoldingRow[] | null = null;
 let lastFetchTime = 0;
-const CACHE_LIFETIME = 1000 * 60 * 10; // 10 хвилин
+const CACHE_LIFETIME = 1000 * 60 * 10;
 
 export async function getCryptoHoldings(): Promise<HoldingRow[]> {
   const now = Date.now();

@@ -19,7 +19,7 @@ export default function UserDropdown() {
       appearance={{
         elements: {
           userButtonOuterIdentifier: {
-            color: "white",
+            color: "var(--primary)",
           },
         },
       }}
