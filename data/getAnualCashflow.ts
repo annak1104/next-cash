@@ -22,6 +22,9 @@ export async function getAnnualCashflow(year: number) {
       totalExpenses: sum(
         sql`CASE WHEN ${categoriesTable.type} = 'expense' THEN ${transactionsTable.amount} ELSE 0 END`,
       ),
+      totalInvestments: sum(
+        sql`CASE WHEN ${categoriesTable.name} = 'Investments' THEN ${transactionsTable.amount} ELSE 0 END`,
+      ),
     })
     .from(transactionsTable)
     .leftJoin(
@@ -40,6 +43,7 @@ export async function getAnnualCashflow(year: number) {
     month: number;
     income: number;
     expenses: number;
+    investments: number;
   }[] = [];
 
   for (let i = 1; i <= 12; i++) {
@@ -48,6 +52,7 @@ export async function getAnnualCashflow(year: number) {
       month: i,
       income: Number(monthlyCashflow?.totalIncome ?? 0),
       expenses: Number(monthlyCashflow?.totalExpenses ?? 0),
+      investments: Number(monthlyCashflow?.totalInvestments ?? 0),
     });
   }
 

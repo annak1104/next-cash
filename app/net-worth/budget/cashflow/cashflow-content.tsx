@@ -14,7 +14,12 @@ import { Bar, BarChart, CartesianGrid, Legend, XAxis, YAxis } from "recharts";
 export function CashflowContent({
   annualCashflow,
 }: {
-  annualCashflow: { month: number; income: number; expenses: number }[];
+  annualCashflow: {
+    month: number;
+    income: number;
+    expenses: number;
+    investments: number;
+  }[];
 }) {
   const today = new Date();
   const totalAnnualIncome = annualCashflow.reduce(
@@ -29,7 +34,13 @@ export function CashflowContent({
     },
     0,
   );
-  const balance = totalAnnualIncome - totalAnnualExpenses;
+  const totalAnnualInvestments = annualCashflow.reduce(
+    (prevValue: number, month) => {
+      return prevValue + month.investments;
+    },
+    0,
+  );
+  const balance = totalAnnualIncome - totalAnnualExpenses - totalAnnualInvestments;
 
   return (
     <div className="flex flex-col sm:flex-row">
@@ -46,6 +57,10 @@ export function CashflowContent({
             expenses: {
               label: "Expenses",
               color: "#f97316",
+            },
+            investments: {
+              label: "Investments",
+              color: "#06b6d4",
             },
           }}
           className="h-[300px] w-full"
@@ -91,6 +106,7 @@ export function CashflowContent({
             />
             <Bar dataKey="income" radius={4} fill="var(--color-income)" />
             <Bar dataKey="expenses" radius={4} fill="var(--color-expenses)" />
+            <Bar dataKey="investments" radius={4} fill="var(--color-investments)" />
           </BarChart>
         </ChartContainer>
         <ScrollBar orientation="horizontal" />
@@ -111,6 +127,15 @@ export function CashflowContent({
           </span>
           <h2 className="text-3xl">
             ${numeral(totalAnnualExpenses).format("0,0[.]00")}
+          </h2>
+        </div>
+        <div className="border-t" />
+        <div>
+          <span className="text-muted-foreground text-sm font-bold">
+            Investments
+          </span>
+          <h2 className="text-3xl">
+            ${numeral(totalAnnualInvestments).format("0,0[.]00")}
           </h2>
         </div>
         <div className="border-t" />
