@@ -1,4 +1,4 @@
-import PortfolioPage from "./portfolio/page";
+import PortfolioPage from "../portfolio/page";
 
 export default async function DashboardPage() {
   return (

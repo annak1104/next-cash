@@ -1,5 +1,5 @@
-import Cashflow from "@/app/net-worth/budget/cashflow/cashflow";
-import RecentTransactions from "@/app/net-worth/budget/recent-transactions";
+import Cashflow from "@/app/[locale]/net-worth/budget/cashflow/cashflow";
+import RecentTransactions from "@/app/[locale]/net-worth/budget/recent-transactions";
 import WalletsSection from "./wallets-section";
 
 export default async function BudgetPage({
