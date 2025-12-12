@@ -60,10 +60,13 @@ export default async function RecentTransactions() {
                       className={
                         transaction.transactionType === "income"
                           ? "bg-lime-500"
-                          : "bg-orange-500"
+                          : transaction.transactionType === "transfer" ||
+                              transaction.transactionType === "adjustment"
+                            ? "bg-sky-500"
+                            : "bg-orange-500"
                       }
                     >
-                      {transaction.transactionType}
+                      {transaction.transactionType || "expense"}
                     </Badge>
                   </TableCell>
                   <TableCell>{transaction.category}</TableCell>

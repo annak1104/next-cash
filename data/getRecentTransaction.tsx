@@ -18,16 +18,40 @@ export async function getRecentTransactions() {
       amount: transactionsTable.amount,
       transactionDate: transactionsTable.transactionDate,
       category: categoriesTable.name,
-      transactionType: categoriesTable.type,
+      transactionType: transactionsTable.transactionType,
+      transferId: transactionsTable.transferId,
+      fromWalletId: transactionsTable.fromWalletId,
+      walletId: transactionsTable.walletId,
     })
     .from(transactionsTable)
     .where(eq(transactionsTable.userId, userId))
     .orderBy(desc(transactionsTable.transactionDate))
-    .limit(5)
     .leftJoin(
       categoriesTable,
       eq(transactionsTable.categoryId, categoriesTable.id),
     );
 
-  return transactions;
+  // Filter out duplicate transfer transactions
+  // For transfers, show only the "from" wallet transaction (the outgoing one)
+  const seenTransferIds = new Set<number>();
+  const filteredTransactions = transactions.filter((tx) => {
+    // If it's a transfer transaction
+    if (tx.transferId) {
+      // If we've already seen this transfer, skip it
+      if (seenTransferIds.has(tx.transferId)) {
+        return false;
+      }
+      // For transfers, only show the "from" wallet transaction
+      // (the one where walletId matches fromWalletId)
+      if (tx.walletId === tx.fromWalletId) {
+        seenTransferIds.add(tx.transferId);
+        return true;
+      }
+      return false;
+    }
+    // For non-transfer transactions, include them
+    return true;
+  });
+
+  return filteredTransactions.slice(0, 5);
 }

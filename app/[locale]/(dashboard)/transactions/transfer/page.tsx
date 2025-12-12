@@ -7,13 +7,13 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Card, CardContent } from "@/components/ui/card";
-import { getCategories } from "@/data/getCategories";
 import getWallets from "@/data/getWallets";
 import Link from "next/link";
 import TransferTransactionForm from "./transfer-transaction-form";
+import { getCashTransferCategoryId } from "./actions";
 
 export default async function TransferTransactionPage() {
-  const categories = await getCategories();
+  const cashTransferCategoryId = await getCashTransferCategoryId();
   const wallets = await getWallets();
 
   return (
@@ -33,7 +33,10 @@ export default async function TransferTransactionPage() {
       </Breadcrumb>
       <Card className="mt-4 max-w-3xl">
         <CardContent className="pt-6">
-          <TransferTransactionForm categories={categories} wallets={wallets} />
+          <TransferTransactionForm
+            cashTransferCategoryId={cashTransferCategoryId}
+            wallets={wallets}
+          />
         </CardContent>
       </Card>
     </div>
