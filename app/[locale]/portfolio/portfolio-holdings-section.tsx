@@ -102,7 +102,20 @@ export default function PortfolioHoldingsSection({
       });
 
       if (!response.ok) {
-        throw new Error("Failed to load holdings");
+        // Try to extract error message from response
+        let errorMessage = "Failed to load holdings";
+        try {
+          const errorData = await response.json();
+          if (errorData?.error) {
+            errorMessage = errorData.error;
+          } else {
+            errorMessage = `Failed to load holdings (${response.status} ${response.statusText})`;
+          }
+        } catch {
+          // If response is not JSON, use status text
+          errorMessage = `Failed to load holdings (${response.status} ${response.statusText})`;
+        }
+        throw new Error(errorMessage);
       }
 
       const data: HoldingRow[] = await response.json();
@@ -113,8 +126,10 @@ export default function PortfolioHoldingsSection({
         setAllStats(calculateStats(data));
       }
     } catch (err) {
-      console.error(err);
-      setError("Failed to load holdings. Please try again.");
+      console.error("Error loading holdings:", err);
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to load holdings. Please try again.";
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }

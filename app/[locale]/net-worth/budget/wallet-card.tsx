@@ -33,7 +33,7 @@ export default function WalletCard({ wallet }: Props) {
       </div>
 
       {/* Wallet name and balance in one line */}
-      <div className="flex w-full items-center justify-between gap-2">
+      <div className="flex flex-col w-full items-center justify-between gap-2">
         <span className="text-sm font-medium">{wallet.name}</span>
         <span className="text-lg font-bold">
           {formatCurrency(balance, wallet.currency)}

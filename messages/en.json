@@ -1,0 +1,13 @@
+{
+  "home": {
+    "btn": "Go To Your Dashboard",
+    "header": "Track your finances with ease"
+  },
+  "navbar": {
+    "budget": "Budget",
+    "dashboard": "Dashboard",
+    "net-worth": "Net-worth",
+    "portfolios": "Portfolios",
+    "trades": "Trades"
+  }
+}

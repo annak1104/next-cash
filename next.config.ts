@@ -1,9 +1,19 @@
 import type { NextConfig } from "next";
+import createNextIntlPlugin from "next-intl/plugin";
+
+const withNextIntl = createNextIntlPlugin();
 
 const nextConfig: NextConfig = {
-   images: {
-    domains: ["coin-images.coingecko.com"],
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "coin-images.coingecko.com",
+        port: "",
+        pathname: "/**",
+      },
+    ],
   },
 };
 
-export default nextConfig;
+export default withNextIntl(nextConfig);
