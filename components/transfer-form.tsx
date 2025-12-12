@@ -1,7 +1,6 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { type Category } from "@/types/Category";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addDays, format } from "date-fns";
 import { ArrowLeft, CalendarIcon } from "lucide-react";
@@ -34,10 +33,7 @@ export const transferFormSchema = z
     transactionDate: z.coerce
       .date()
       .max(addDays(new Date(), 1), "Transaction date cannot be in the future"),
-    categoryId: z.coerce
-      .number()
-      .positive("Please select a category")
-      .optional(),
+    categoryId: z.coerce.number().positive("Cash Transfer category is required"),
     fromWalletId: z.coerce.number().positive("Please select a source account"),
     toWalletId: z.coerce
       .number()
@@ -58,7 +54,7 @@ type Wallet = {
 };
 
 type Props = {
-  categories: Category[];
+  cashTransferCategoryId: number;
   wallets: Wallet[];
   onSubmit: (data: z.infer<typeof transferFormSchema>) => Promise<void>;
   onSaveAndAddMore?: (
@@ -67,7 +63,7 @@ type Props = {
 };
 
 export default function TransferForm({
-  categories,
+  cashTransferCategoryId,
   wallets,
   onSubmit,
   onSaveAndAddMore,
@@ -81,7 +77,7 @@ export default function TransferForm({
     defaultValues: {
       amount: 0,
       fee: 0,
-      categoryId: 0,
+      categoryId: cashTransferCategoryId,
       fromWalletId: 0,
       toWalletId: 0,
       note: "",
@@ -165,31 +161,14 @@ export default function TransferForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Category</FormLabel>
-                  <Select
-                    onValueChange={(value) =>
-                      field.onChange(
-                        value === "none" ? undefined : Number(value),
-                      )
-                    }
-                    value={field.value ? field.value.toString() : "none"}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Category (optional)" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="none">None</SelectItem>
-                      {categories.map((category) => (
-                        <SelectItem
-                          key={category.id}
-                          value={String(category.id)}
-                        >
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      value="Cash Transfer"
+                      disabled
+                      className="bg-muted cursor-not-allowed"
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}

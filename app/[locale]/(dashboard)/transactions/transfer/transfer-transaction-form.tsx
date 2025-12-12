@@ -1,7 +1,6 @@
 "use client";
 
 import TransferForm, { transferFormSchema } from "@/components/transfer-form";
-import { Category } from "@/types/Category";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -15,10 +14,10 @@ type Wallet = {
 };
 
 export default function TransferTransactionForm({
-  categories,
+  cashTransferCategoryId,
   wallets,
 }: {
-  categories: Category[];
+  cashTransferCategoryId: number;
   wallets: Wallet[];
 }) {
   const router = useRouter();
@@ -75,7 +74,7 @@ export default function TransferTransactionForm({
 
   return (
     <TransferForm
-      categories={categories}
+      cashTransferCategoryId={cashTransferCategoryId}
       wallets={wallets}
       onSubmit={handleSubmit}
       onSaveAndAddMore={handleSaveAndAddMore}

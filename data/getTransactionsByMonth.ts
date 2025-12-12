@@ -38,6 +38,7 @@ export async function getTransactionsByMonth({
       walletCurrency: walletsTable.currency,
       fromWalletId: transactionsTable.fromWalletId,
       toWalletId: transactionsTable.toWalletId,
+      transferId: transactionsTable.transferId,
     })
     .from(transactionsTable)
     .where(
@@ -86,8 +87,31 @@ export async function getTransactionsByMonth({
     });
   }
 
+  // Filter out duplicate transfer transactions
+  // For transfers, show only the "from" wallet transaction (the outgoing one)
+  const seenTransferIds = new Set<number>();
+  const filteredTransactions = transactions.filter((tx) => {
+    // If it's a transfer transaction
+    const transferId = tx.transferId;
+    if (transferId !== null && transferId !== undefined) {
+      // If we've already seen this transfer, skip it
+      if (seenTransferIds.has(transferId)) {
+        return false;
+      }
+      // For transfers, only show the "from" wallet transaction
+      // (the one where walletId matches fromWalletId)
+      if (tx.walletId === tx.fromWalletId) {
+        seenTransferIds.add(transferId);
+        return true;
+      }
+      return false;
+    }
+    // For non-transfer transactions, include them
+    return true;
+  });
+
   // Add wallet names to transactions
-  return transactions.map((tx) => ({
+  return filteredTransactions.map((tx) => ({
     ...tx,
     fromWalletName: tx.fromWalletId ? walletMap.get(tx.fromWalletId) || null : null,
     toWalletName: tx.toWalletId ? walletMap.get(tx.toWalletId) || null : null,

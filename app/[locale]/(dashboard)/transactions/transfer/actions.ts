@@ -5,11 +5,36 @@ import { categoriesTable, transfersTable, transactionsTable } from "@/db/schema"
 import { auth } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm";
 
+// Helper function to get or create Cash Transfer category
+async function getOrCreateCashTransferCategory() {
+  // Try to find existing "Cash Transfer" category
+  const [existingCategory] = await db
+    .select()
+    .from(categoriesTable)
+    .where(eq(categoriesTable.name, "Cash Transfer"))
+    .limit(1);
+
+  if (existingCategory) {
+    return existingCategory.id;
+  }
+
+  // Create "Cash Transfer" category as expense type (can be used for both)
+  const [newCategory] = await db
+    .insert(categoriesTable)
+    .values({
+      name: "Cash Transfer",
+      type: "expense",
+    })
+    .returning();
+
+  return newCategory.id;
+}
+
 export const createTransferTransaction = async (data: {
   amount: number;
   transactionDate: string;
   description: string;
-  categoryId?: number;
+  categoryId: number;
   fromWalletId: number;
   toWalletId: number;
   fee?: number;
@@ -30,21 +55,22 @@ export const createTransferTransaction = async (data: {
     };
   }
 
-  // Verify category if provided
-  if (data.categoryId) {
-    const [category] = await db
-      .select()
-      .from(categoriesTable)
-      .where(eq(categoriesTable.id, data.categoryId))
-      .limit(1);
+  // Verify category exists and is "Cash Transfer"
+  const [category] = await db
+    .select()
+    .from(categoriesTable)
+    .where(eq(categoriesTable.id, data.categoryId))
+    .limit(1);
 
-    if (!category) {
-      return {
-        error: true,
-        message: "Invalid category",
-      };
-    }
+  if (!category) {
+    return {
+      error: true,
+      message: "Invalid category",
+    };
   }
+
+  // Ensure we're using Cash Transfer category
+  const cashTransferCategoryId = await getOrCreateCashTransferCategory();
 
   // Create transfer record
   const [transfer] = await db
@@ -57,42 +83,12 @@ export const createTransferTransaction = async (data: {
       fee: data.fee ? data.fee.toString() : null,
       transactionDate: data.transactionDate,
       description: data.description,
-      categoryId: data.categoryId || null,
+      categoryId: cashTransferCategoryId,
     })
     .returning();
 
-  // Get default expense category if categoryId not provided
-  let expenseCategoryId = data.categoryId;
-  if (!expenseCategoryId) {
-    const [expenseCategory] = await db
-      .select()
-      .from(categoriesTable)
-      .where(eq(categoriesTable.type, "expense"))
-      .limit(1);
-    if (expenseCategory) {
-      expenseCategoryId = expenseCategory.id;
-    }
-  }
-
-  // Get default income category if categoryId not provided
-  let incomeCategoryId = data.categoryId;
-  if (!incomeCategoryId) {
-    const [incomeCategory] = await db
-      .select()
-      .from(categoriesTable)
-      .where(eq(categoriesTable.type, "income"))
-      .limit(1);
-    if (incomeCategory) {
-      incomeCategoryId = incomeCategory.id;
-    }
-  }
-
-  if (!expenseCategoryId || !incomeCategoryId) {
-    return {
-      error: true,
-      message: "Categories not found. Please create income and expense categories first.",
-    };
-  }
+  // Use the same Cash Transfer category for both transactions
+  const transferCategoryId = cashTransferCategoryId;
 
   // Create expense transaction for "from" wallet
   const [expenseTransaction] = await db
@@ -101,7 +97,7 @@ export const createTransferTransaction = async (data: {
       userId,
       amount: data.amount.toString(),
       description: `Transfer to: ${data.description}`,
-      categoryId: expenseCategoryId,
+      categoryId: transferCategoryId,
       walletId: data.fromWalletId,
       transactionDate: data.transactionDate,
       transactionType: "transfer",
@@ -118,7 +114,7 @@ export const createTransferTransaction = async (data: {
       userId,
       amount: data.amount.toString(),
       description: `Transfer from: ${data.description}`,
-      categoryId: incomeCategoryId,
+      categoryId: transferCategoryId,
       walletId: data.toWalletId,
       transactionDate: data.transactionDate,
       transactionType: "transfer",
@@ -134,7 +130,7 @@ export const createTransferTransaction = async (data: {
       userId,
       amount: data.fee.toString(),
       description: `Transfer fee: ${data.description}`,
-      categoryId: expenseCategoryId,
+      categoryId: transferCategoryId,
       walletId: data.fromWalletId, // Fee deducted from source wallet
       transactionDate: data.transactionDate,
       transactionType: "transfer",
@@ -151,4 +147,9 @@ export const createTransferTransaction = async (data: {
     incomeTransactionId: incomeTransaction.id,
   };
 };
+
+// Export function to get cash transfer category ID
+export async function getCashTransferCategoryId() {
+  return await getOrCreateCashTransferCategory();
+}
 
