@@ -7,6 +7,14 @@ const isProtectedRoute = createRouteMatcher(["/portfolio(.*)"]);
 const intlMiddleware = createIntlMiddleware(routing);
 
 export default clerkMiddleware(async (auth, req) => {
+  // Skip intl middleware for API routes
+  if (req.nextUrl.pathname.startsWith("/api")) {
+    if (isProtectedRoute(req)) {
+      await auth.protect();
+    }
+    return;
+  }
+
   const intlResult = intlMiddleware(req);
   if (intlResult) return intlResult;
 

@@ -16,7 +16,7 @@ import {
 import { ChartColumnBigIcon } from "lucide-react";
 import type { Metadata } from "next";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
+import { getMessages, setRequestLocale } from "next-intl/server";
 import { Poppins } from "next/font/google";
 import { notFound } from "next/navigation";
 import { Toaster } from "sonner";
@@ -49,6 +49,7 @@ export default async function RootLayout({
   }
 
   setRequestLocale(locale);
+  const messages = await getMessages();
 
   return (
     <ClerkProvider>
@@ -60,7 +61,7 @@ export default async function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <NextIntlClientProvider>
+            <NextIntlClientProvider locale={locale} messages={messages}>
               <nav className="bg-background flex h-16 items-center justify-between border-b p-4 text-white">
                 <div className="flex gap-10">
                   <Link
