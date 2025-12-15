@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { getTotalBalance } from "@/data/getTotalBalance";
 import { getWalletBalances } from "@/data/getWalletBalance";
 import getWallets from "@/data/getWallets";
-import { ArrowDown, ArrowsUpFromLine, ArrowUp, Calculator } from "lucide-react";
+import { ArrowDown, ArrowLeftRight, ArrowUp, Calculator } from "lucide-react";
 import Link from "next/link";
 import TotalBalance from "./total-balance";
 import WalletsList from "./wallets-list";
@@ -35,7 +35,7 @@ export default async function WalletsSection() {
         </Button>
         <Button variant="outline" asChild>
           <Link href="/transactions/transfer">
-            <ArrowsUpFromLine />
+            <ArrowLeftRight />
             Transfers
           </Link>
         </Button>

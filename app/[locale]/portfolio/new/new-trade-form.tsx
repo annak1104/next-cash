@@ -248,7 +248,7 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
         >
           {/* Entry type toggle */}
           <div className="bg-muted inline-flex rounded-full p-1 text-xs">
-            <Button
+            {/* <Button
               type="button"
               size="sm"
               variant={watchEntryType === "single" ? "default" : "ghost"}
@@ -259,7 +259,7 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
               onClick={() => form.setValue("entryType", "single")}
             >
               Single entry
-            </Button>
+            </Button> */}
             {/* <Button
               type="button"
               size="sm"
@@ -277,44 +277,7 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
           {/* Main grid */}
           <div className="bg-background space-y-4 rounded-2xl border p-4 sm:p-6">
             {/* Asset type */}
-            <FormField
-              control={form.control}
-              name="assetType"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Asset type</FormLabel>
-                  <FormControl>
-                    <div className="bg-muted inline-flex rounded-full p-1 text-xs">
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant={field.value === "crypto" ? "default" : "ghost"}
-                        className={cn(
-                          "rounded-full px-4",
-                          field.value === "crypto" && "shadow-sm",
-                        )}
-                        onClick={() => field.onChange("crypto")}
-                      >
-                        Crypto
-                      </Button>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant={field.value === "stock" ? "default" : "ghost"}
-                        className={cn(
-                          "rounded-full px-4",
-                          field.value === "stock" && "shadow-sm",
-                        )}
-                        onClick={() => field.onChange("stock")}
-                      >
-                        Stock
-                      </Button>
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+           
             {/* Type */}
             <FormField
               control={form.control}

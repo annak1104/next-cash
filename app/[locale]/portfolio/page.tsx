@@ -1,14 +1,10 @@
-import { Button } from "@/components/ui/button";
-import { getPortfolioHoldings } from "@/data/getPortfolioHoldings";
 import { getPortfolioHistory } from "@/data/getPortfolioHistory";
+import { getPortfolioHoldings } from "@/data/getPortfolioHoldings";
 import { getPortfolioStats } from "@/data/getPortfolioStats";
 import getPortfolios from "@/data/getPortfolios";
-import { PlusIcon } from "lucide-react";
-import Link from "next/link";
 import CreatePortfolioButton from "./create-portfolio-button";
 import PortfolioHoldingsSection from "./portfolio-holdings-section";
 import PortfolioValueChart from "./portfolio-value-chart";
-import AssetAllocationTreemap from "./asset-allocation-treemap";
 
 export default async function PortfolioPage() {
   const portfolios = await getPortfolios();
@@ -18,19 +14,6 @@ export default async function PortfolioPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-1 py-10">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Holdings</h1>
-        <div className="flex gap-2">
-          <Button asChild variant="outline">
-            <Link href="portfolio/new">
-              <PlusIcon className="mr-2 h-4 w-4" />
-              Trades
-            </Link>
-          </Button>
-          <CreatePortfolioButton />
-        </div>
-      </div>
-
       {/* Charts Section */}
       <div className="mb-6">
         <PortfolioValueChart
@@ -46,6 +29,12 @@ export default async function PortfolioPage() {
           holdings={initialHoldings}
           currency={stats.currency}
         /> */}
+      </div>
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-2xl font-semibold">Portfolios</h1>
+        <div className="flex gap-2">
+          <CreatePortfolioButton />
+        </div>
       </div>
 
       <PortfolioHoldingsSection
