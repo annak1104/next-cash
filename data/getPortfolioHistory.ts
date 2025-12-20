@@ -291,5 +291,25 @@ export async function getPortfolioHistory(
     });
   }
 
+  // Ensure the latest point matches the actual current portfolio value so the
+  // chart and summary stay in sync.
+  const currentValue = currentHoldings.reduce((sum, holding) => {
+    const key = `${holding.portfolioId}-${holding.symbol}-${holding.assetType}`;
+    const quantity = Number(holding.quantity);
+    const price =
+      currentPrices.get(key) ||
+      Number(holding.currentPrice) ||
+      Number(holding.avgPrice) ||
+      0;
+    return sum + quantity * price;
+  }, 0);
+
+  if (dataPoints.length > 0) {
+    dataPoints[dataPoints.length - 1] = {
+      date: format(endDate, "yyyy-MM-dd"),
+      value: currentValue,
+    };
+  }
+
   return dataPoints;
 }
