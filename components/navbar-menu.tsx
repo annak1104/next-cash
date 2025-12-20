@@ -33,6 +33,9 @@ export default function NavbarMenu() {
           </NavigationMenuTrigger>
           <NavigationMenuContent>
             <NavigationMenuLink asChild>
+              <Link href="/net-worth/dashboard">Dashboard</Link>
+            </NavigationMenuLink>
+            <NavigationMenuLink asChild>
               <Link href="/net-worth/budget">{t("budget")}</Link>
             </NavigationMenuLink>
           </NavigationMenuContent>
