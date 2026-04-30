@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "concurrently --raw \"next dev --turbo\" \"i18nexus listen\"",
-    "build": "i18nexus pull && next build",
-    "start": "i18nexus pull && next start",
+    "build": "npx i18nexus pull && next build",
+    "dev": "concurrently --raw \"next dev --turbo\" \"npx i18nexus listen\"",
+    "start": "npx i18nexus pull && next start",
     "lint": "eslint",
     "prepare": "husky"
   },
@@ -57,6 +57,7 @@
     "eslint-config-next": "16.0.3",
     "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",
+    "i18nexus": "^3.4.1",
     "lint-staged": "^16.2.6",
     "prettier": "^3.6.2",
     "prettier-plugin-organize-imports": "^4.3.0",
