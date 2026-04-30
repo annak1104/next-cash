@@ -1,9 +1,8 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import CurrencyAmount from "@/components/currency-amount";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { getCurrencyFlag } from "@/lib/currency-utils";
+import { formatCurrency, getCurrencyFlag } from "@/lib/currency-utils";
 
 type Wallet = {
   id: number;
@@ -33,7 +32,7 @@ export default function WalletsList({ wallets }: WalletsListProps) {
                   className="flex items-center justify-between rounded-lg border p-4"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-xl">
+                    <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-full text-xl">
                       {flag}
                     </div>
                     <div>
@@ -42,17 +41,14 @@ export default function WalletsList({ wallets }: WalletsListProps) {
                   </div>
                   <div className="text-right">
                     <p className="font-bold">
-                      <CurrencyAmount
-                        amount={wallet.balance}
-                        fromCurrency={wallet.currency}
-                      />
+                      {formatCurrency(wallet.balance, wallet.currency)}
                     </p>
                   </div>
                 </div>
               );
             })}
             {wallets.length === 0 && (
-              <div className="text-center py-8 text-muted-foreground">
+              <div className="text-muted-foreground py-8 text-center">
                 No wallets found
               </div>
             )}
@@ -63,4 +59,3 @@ export default function WalletsList({ wallets }: WalletsListProps) {
     </Card>
   );
 }
-

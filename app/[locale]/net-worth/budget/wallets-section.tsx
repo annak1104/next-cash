@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { getTotalBalance } from "@/data/getTotalBalance";
 import { getWalletBalances } from "@/data/getWalletBalance";
 import getWallets from "@/data/getWallets";
 import { ArrowDown, ArrowLeftRight, ArrowUp, Calculator } from "lucide-react";
@@ -10,7 +9,6 @@ import WalletsList from "./wallets-list";
 export default async function WalletsSection() {
   const wallets = await getWallets();
   const balances = await getWalletBalances();
-  const totalBalance = await getTotalBalance();
 
   const walletsWithBalances = wallets.map((wallet) => ({
     ...wallet,
@@ -19,7 +17,7 @@ export default async function WalletsSection() {
 
   return (
     <div className="space-y-4">
-      <TotalBalance totalBalance={totalBalance} />
+      <TotalBalance wallets={walletsWithBalances} />
       <div className="flex gap-1">
         <Button asChild>
           <Link href="/transactions/income">

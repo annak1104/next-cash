@@ -1,9 +1,10 @@
 "server-only";
 
-import { db } from "@/db";
-import { categoriesTable, transactionsTable } from "@/db/schema";
+import { convertCurrencyFromRates } from "@/lib/currency-converter";
+import { getUsdExchangeRates } from "@/lib/exchange-rates-server";
 import { auth } from "@clerk/nextjs/server";
-import { and, eq, sql } from "drizzle-orm";
+import { getWalletBalances } from "./getWalletBalance";
+import getWallets from "./getWallets";
 
 export async function getTotalBalance(): Promise<number> {
   const { userId } = await auth();
@@ -12,29 +13,20 @@ export async function getTotalBalance(): Promise<number> {
     return 0;
   }
 
-  // Get all transactions with their categories, only including transactions with wallets
-  const result = await db
-    .select({
-      income: sql<number>`COALESCE(SUM(CASE WHEN ${categoriesTable.type} = 'income' THEN ${transactionsTable.amount}::numeric ELSE 0 END), 0)`,
-      expense: sql<number>`COALESCE(SUM(CASE WHEN ${categoriesTable.type} = 'expense' THEN ${transactionsTable.amount}::numeric ELSE 0 END), 0)`,
-    })
-    .from(transactionsTable)
-    .leftJoin(
-      categoriesTable,
-      eq(transactionsTable.categoryId, categoriesTable.id),
-    )
-    .where(
-      and(
-        eq(transactionsTable.userId, userId),
-        sql`${transactionsTable.walletId} IS NOT NULL`,
-      ),
+  const [wallets, balances] = await Promise.all([
+    getWallets(),
+    getWalletBalances(),
+  ]);
+
+  const rates = await getUsdExchangeRates().catch((error) => {
+    console.error("Failed to load exchange rates for total balance:", error);
+    return { USD: 1 };
+  });
+
+  return wallets.reduce((total, wallet) => {
+    const balance = balances[wallet.id] ?? 0;
+    return (
+      total + convertCurrencyFromRates(balance, wallet.currency, "USD", rates)
     );
-
-  if (result.length === 0) {
-    return 0;
-  }
-
-  const totalBalance = Number(result[0].income) - Number(result[0].expense);
-  return totalBalance;
+  }, 0);
 }
-

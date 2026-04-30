@@ -5,7 +5,9 @@ import { categoriesTable, transactionsTable } from "@/db/schema";
 import { auth } from "@clerk/nextjs/server";
 import { and, eq, sql } from "drizzle-orm";
 
-export default async function getWalletBalance(walletId: number): Promise<number> {
+export default async function getWalletBalance(
+  walletId: number,
+): Promise<number> {
   const { userId } = await auth();
 
   if (!userId) {
@@ -14,8 +16,24 @@ export default async function getWalletBalance(walletId: number): Promise<number
 
   const result = await db
     .select({
-      income: sql<number>`COALESCE(SUM(CASE WHEN ${categoriesTable.type} = 'income' THEN ${transactionsTable.amount}::numeric ELSE 0 END), 0)`,
-      expense: sql<number>`COALESCE(SUM(CASE WHEN ${categoriesTable.type} = 'expense' THEN ${transactionsTable.amount}::numeric ELSE 0 END), 0)`,
+      income: sql<number>`COALESCE(SUM(CASE
+        WHEN ${transactionsTable.transactionType} = 'transfer'
+          AND ${transactionsTable.toWalletId} = ${walletId}
+        THEN ${transactionsTable.amount}::numeric
+        WHEN (${transactionsTable.transactionType} IS NULL OR ${transactionsTable.transactionType} != 'transfer')
+          AND ${categoriesTable.type} = 'income'
+        THEN ${transactionsTable.amount}::numeric
+        ELSE 0
+      END), 0)`,
+      expense: sql<number>`COALESCE(SUM(CASE
+        WHEN ${transactionsTable.transactionType} = 'transfer'
+          AND ${transactionsTable.fromWalletId} = ${walletId}
+        THEN ${transactionsTable.amount}::numeric
+        WHEN (${transactionsTable.transactionType} IS NULL OR ${transactionsTable.transactionType} != 'transfer')
+          AND ${categoriesTable.type} = 'expense'
+        THEN ${transactionsTable.amount}::numeric
+        ELSE 0
+      END), 0)`,
     })
     .from(transactionsTable)
     .leftJoin(
@@ -37,9 +55,7 @@ export default async function getWalletBalance(walletId: number): Promise<number
   return balance;
 }
 
-export async function getWalletBalances(): Promise<
-  Record<number, number>
-> {
+export async function getWalletBalances(): Promise<Record<number, number>> {
   const { userId } = await auth();
 
   if (!userId) {
@@ -49,8 +65,24 @@ export async function getWalletBalances(): Promise<
   const result = await db
     .select({
       walletId: transactionsTable.walletId,
-      income: sql<number>`COALESCE(SUM(CASE WHEN ${categoriesTable.type} = 'income' THEN ${transactionsTable.amount}::numeric ELSE 0 END), 0)`,
-      expense: sql<number>`COALESCE(SUM(CASE WHEN ${categoriesTable.type} = 'expense' THEN ${transactionsTable.amount}::numeric ELSE 0 END), 0)`,
+      income: sql<number>`COALESCE(SUM(CASE
+        WHEN ${transactionsTable.transactionType} = 'transfer'
+          AND ${transactionsTable.toWalletId} = ${transactionsTable.walletId}
+        THEN ${transactionsTable.amount}::numeric
+        WHEN (${transactionsTable.transactionType} IS NULL OR ${transactionsTable.transactionType} != 'transfer')
+          AND ${categoriesTable.type} = 'income'
+        THEN ${transactionsTable.amount}::numeric
+        ELSE 0
+      END), 0)`,
+      expense: sql<number>`COALESCE(SUM(CASE
+        WHEN ${transactionsTable.transactionType} = 'transfer'
+          AND ${transactionsTable.fromWalletId} = ${transactionsTable.walletId}
+        THEN ${transactionsTable.amount}::numeric
+        WHEN (${transactionsTable.transactionType} IS NULL OR ${transactionsTable.transactionType} != 'transfer')
+          AND ${categoriesTable.type} = 'expense'
+        THEN ${transactionsTable.amount}::numeric
+        ELSE 0
+      END), 0)`,
     })
     .from(transactionsTable)
     .leftJoin(
@@ -75,4 +107,3 @@ export async function getWalletBalances(): Promise<
 
   return balances;
 }
-

@@ -1,12 +1,12 @@
+import { getAnnualCashflow } from "@/data/getAnualCashflow";
 import { getMonthlyNetWorth } from "@/data/getMonthlyNetWorth";
+import { getPortfolioHistory } from "@/data/getPortfolioHistory";
 import { getPortfolioStats } from "@/data/getPortfolioStats";
 import { getTotalBalance } from "@/data/getTotalBalance";
 import { getWalletBalances } from "@/data/getWalletBalance";
 import getWallets from "@/data/getWallets";
-import { getAnnualCashflow } from "@/data/getAnualCashflow";
-import { getPortfolioHistory } from "@/data/getPortfolioHistory";
-import SummaryCards from "./summary-cards";
 import MonthlyNetWorthChart from "./monthly-net-worth-chart";
+import SummaryCards from "./summary-cards";
 import WalletsList from "./wallets-list";
 
 export default async function DashboardPage() {
@@ -57,9 +57,7 @@ export default async function DashboardPage() {
   // Calculate unrealized P&L for total net worth
   const totalNetWorthUnrealizedPL = portfolioStats.unrealizedPL;
   const totalNetWorthUnrealizedPLPercent =
-    totalNetWorth > 0
-      ? (totalNetWorthUnrealizedPL / totalNetWorth) * 100
-      : 0;
+    totalNetWorth > 0 ? (totalNetWorthUnrealizedPL / totalNetWorth) * 100 : 0;
 
   // Get wallets with balances
   const walletsWithBalances = wallets.map((wallet) => ({
@@ -67,8 +65,8 @@ export default async function DashboardPage() {
     balance: balances[wallet.id] ?? 0,
   }));
 
-  // Use first wallet's currency or default to USD
-  const currency = wallets[0]?.currency ?? "USD";
+  // Cash and portfolio aggregates are normalized to USD before client display.
+  const currency = "USD";
 
   // Format portfolio history for mini charts
   const chartData = portfolioHistory.map((point) => ({
@@ -77,7 +75,7 @@ export default async function DashboardPage() {
   }));
 
   return (
-    <div className="mx-auto max-w-7xl px-1 py-10 space-y-6">
+    <div className="mx-auto max-w-7xl space-y-6 px-1 py-10">
       {/* Summary Cards */}
       <SummaryCards
         totalNetWorth={totalNetWorth}
@@ -102,10 +100,7 @@ export default async function DashboardPage() {
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Monthly Net Worth Chart */}
         <div className="lg:col-span-2">
-          <MonthlyNetWorthChart
-            data={monthlyNetWorth}
-            currency={currency}
-          />
+          <MonthlyNetWorthChart data={monthlyNetWorth} currency={currency} />
         </div>
 
         {/* Wallets List */}

@@ -9,7 +9,7 @@ import {
 } from "@/db/schema";
 import { convertCurrency } from "@/lib/currency-converter";
 import { auth } from "@clerk/nextjs/server";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 // Helper function to get or create Cash Transfer category
 async function getOrCreateCashTransferCategory() {
@@ -61,6 +61,20 @@ export const createTransferTransaction = async (data: {
     };
   }
 
+  if (!Number.isFinite(data.amount) || data.amount <= 0) {
+    return {
+      error: true,
+      message: "Amount must be greater than 0",
+    };
+  }
+
+  if (data.fee !== undefined && (!Number.isFinite(data.fee) || data.fee < 0)) {
+    return {
+      error: true,
+      message: "Fee cannot be negative",
+    };
+  }
+
   // Verify category exists and is "Cash Transfer"
   const [category] = await db
     .select()
@@ -81,12 +95,22 @@ export const createTransferTransaction = async (data: {
   const [fromWallet] = await db
     .select({ id: walletsTable.id, currency: walletsTable.currency })
     .from(walletsTable)
-    .where(eq(walletsTable.id, data.fromWalletId))
+    .where(
+      and(
+        eq(walletsTable.id, data.fromWalletId),
+        eq(walletsTable.userId, userId),
+      ),
+    )
     .limit(1);
   const [toWallet] = await db
     .select({ id: walletsTable.id, currency: walletsTable.currency })
     .from(walletsTable)
-    .where(eq(walletsTable.id, data.toWalletId))
+    .where(
+      and(
+        eq(walletsTable.id, data.toWalletId),
+        eq(walletsTable.userId, userId),
+      ),
+    )
     .limit(1);
 
   if (!fromWallet || !toWallet) {

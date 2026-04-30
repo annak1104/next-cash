@@ -1,24 +1,43 @@
-import CurrencyAmount from "@/components/currency-amount";
-import getWallets from "@/data/getWallets";
+"use client";
 
-type Props = {
-  totalBalance: number;
+import { useCurrency } from "@/contexts/currency-context";
+import { formatCurrency } from "@/lib/currency-utils";
+import { useMemo } from "react";
+
+type WalletBalance = {
+  id: number;
+  currency: string;
+  balance: number;
 };
 
-export default async function TotalBalance({ totalBalance }: Props) {
-  const wallets = await getWallets();
-  // Use the first wallet's currency, or default to USD
-  const defaultCurrency = wallets[0]?.currency ?? "USD";
+type Props = {
+  wallets: WalletBalance[];
+};
+
+export default function TotalBalance({ wallets }: Props) {
+  const { convertAmount, selectedCurrency, isLoadingRates } = useCurrency();
+  const totalBalance = useMemo(
+    () =>
+      wallets.reduce(
+        (sum, wallet) => sum + convertAmount(wallet.balance, wallet.currency),
+        0,
+      ),
+    [convertAmount, wallets],
+  );
 
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-sm text-muted-foreground">Total balance</h2>
+        <h2 className="text-muted-foreground text-sm">Total balance</h2>
         <p className="text-4xl font-bold">
-          <CurrencyAmount amount={totalBalance} fromCurrency={defaultCurrency} />
+          {formatCurrency(totalBalance, selectedCurrency)}
         </p>
+        {isLoadingRates && (
+          <p className="text-muted-foreground text-sm">
+            Updating exchange rates...
+          </p>
+        )}
       </div>
     </div>
   );
 }
-

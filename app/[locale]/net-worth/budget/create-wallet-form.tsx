@@ -17,25 +17,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { SUPPORTED_CURRENCY_OPTIONS } from "@/lib/supportedCurrencies";
+import { walletSchema } from "@/validation/walletSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { walletSchema } from "@/validation/walletSchema";
 
 const walletFormSchema = walletSchema;
-
-const currencies = [
-  { value: "USD", label: "USD - US Dollar" },
-  { value: "EUR", label: "EUR - Euro" },
-  { value: "GBP", label: "GBP - British Pound" },
-  { value: "UAH", label: "UAH - Ukrainian Hryvnia" },
-  { value: "JPY", label: "JPY - Japanese Yen" },
-  { value: "CNY", label: "CNY - Chinese Yuan" },
-  { value: "CAD", label: "CAD - Canadian Dollar" },
-  { value: "AUD", label: "AUD - Australian Dollar" },
-  { value: "CHF", label: "CHF - Swiss Franc" },
-  { value: "PLN", label: "PLN - Polish Zloty" },
-];
 
 type Props = {
   onSubmit: (data: z.infer<typeof walletFormSchema>) => Promise<void>;
@@ -81,7 +69,7 @@ export default function CreateWalletForm({ onSubmit, onCancel }: Props) {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {currencies.map((currency) => (
+                    {SUPPORTED_CURRENCY_OPTIONS.map((currency) => (
                       <SelectItem key={currency.value} value={currency.value}>
                         {currency.label}
                       </SelectItem>
@@ -107,4 +95,3 @@ export default function CreateWalletForm({ onSubmit, onCancel }: Props) {
     </Form>
   );
 }
-
