@@ -1,6 +1,8 @@
 import { LanguageDropdown } from "@/components/lang-dropdown";
+import CurrencySelector from "@/components/currency-selector";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Button } from "@/components/ui/button";
+import { CurrencyProvider } from "@/contexts/currency-context";
 
 import NavbarMenu from "@/components/navbar-menu";
 import UserDropdown from "@/components/user-dropdown";
@@ -62,6 +64,7 @@ export default async function RootLayout({
             disableTransitionOnChange
           >
             <NextIntlClientProvider locale={locale} messages={messages}>
+              <CurrencyProvider>
               <nav className="bg-background flex h-16 items-center justify-between border-b p-4 text-white">
                 <div className="flex gap-10">
                   <Link
@@ -76,6 +79,7 @@ export default async function RootLayout({
                   </SignedIn>
                 </div>
                 <div className="flex gap-1">
+                  <CurrencySelector />
                   <LanguageDropdown />
                   <SignedOut>
                     <div className="flex items-center">
@@ -95,6 +99,7 @@ export default async function RootLayout({
 
               {children}
               <Toaster />
+              </CurrencyProvider>
             </NextIntlClientProvider>
           </ThemeProvider>
         </body>

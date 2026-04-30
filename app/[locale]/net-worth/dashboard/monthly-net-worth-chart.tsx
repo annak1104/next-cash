@@ -6,6 +6,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useCurrency } from "@/contexts/currency-context";
 import { formatCurrency } from "@/lib/currency-utils";
 import { format } from "date-fns";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
@@ -21,6 +22,7 @@ export default function MonthlyNetWorthChart({
   data,
   currency,
 }: MonthlyNetWorthChartProps) {
+  const { convertAmount, selectedCurrency } = useCurrency();
   // Format data for chart
   const chartData = data.map((item) => ({
     month: item.month,
@@ -70,7 +72,8 @@ export default function MonthlyNetWorthChart({
               tickMargin={8}
               className="text-xs"
               tickFormatter={(value) => {
-                return `$${numeral(value).format("0.0a")}`;
+                const converted = convertAmount(Number(value), currency);
+                return `${selectedCurrency} ${numeral(converted).format("0.0a")}`;
               }}
             />
             <ChartTooltip
@@ -91,7 +94,10 @@ export default function MonthlyNetWorthChart({
                     const percent =
                       data.total > 0 ? (numValue / data.total) * 100 : 0;
                     return [
-                      `${formatCurrency(numValue, currency)} (${percent.toFixed(
+                      `${formatCurrency(
+                        convertAmount(numValue, currency),
+                        selectedCurrency,
+                      )} (${percent.toFixed(
                         2,
                       )}%)`,
                       name === "cash"
@@ -100,14 +106,6 @@ export default function MonthlyNetWorthChart({
                           ? "Stocks"
                           : "Cryptocurrency",
                     ];
-                  }}
-                  footerFormatter={(payload) => {
-                    if (!payload || payload.length === 0) return "";
-                    const data = payload[0]?.payload as typeof chartData[0];
-                    return `Total net worth: ${formatCurrency(
-                      data.total,
-                      currency,
-                    )} (100%)`;
                   }}
                 />
               }

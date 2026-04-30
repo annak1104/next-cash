@@ -51,6 +51,7 @@
     "@types/numeral": "^2.0.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "baseline-browser-mapping": "^2.10.24",
     "drizzle-kit": "^0.31.7",
     "eslint": "^9",
     "eslint-config-next": "16.0.3",

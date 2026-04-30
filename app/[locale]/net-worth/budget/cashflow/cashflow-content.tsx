@@ -6,6 +6,8 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { useCurrency } from "@/contexts/currency-context";
+import { formatCurrency } from "@/lib/currency-utils";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import numeral from "numeral";
@@ -21,6 +23,8 @@ export function CashflowContent({
     investments: number;
   }[];
 }) {
+  const { convertAmount, selectedCurrency } = useCurrency();
+  const baseCurrency = "USD";
   const today = new Date();
   const totalAnnualIncome = annualCashflow.reduce(
     (prevValue: number, month) => {
@@ -69,7 +73,8 @@ export function CashflowContent({
             <CartesianGrid vertical={false} />
             <YAxis
               tickFormatter={(value) => {
-                return `$${numeral(value).format("0,0")}`;
+                const converted = convertAmount(Number(value), baseCurrency);
+                return `${selectedCurrency} ${numeral(converted).format("0,0")}`;
               }}
             />
             <XAxis
@@ -117,7 +122,10 @@ export function CashflowContent({
             Income
           </span>
           <h2 className="text-3xl">
-            ${numeral(totalAnnualIncome).format("0,0[.]00")}
+            {formatCurrency(
+              convertAmount(totalAnnualIncome, baseCurrency),
+              selectedCurrency,
+            )}
           </h2>
         </div>
         <div className="border-t" />
@@ -126,7 +134,10 @@ export function CashflowContent({
             Expenses
           </span>
           <h2 className="text-3xl">
-            ${numeral(totalAnnualExpenses).format("0,0[.]00")}
+            {formatCurrency(
+              convertAmount(totalAnnualExpenses, baseCurrency),
+              selectedCurrency,
+            )}
           </h2>
         </div>
         <div className="border-t" />
@@ -135,7 +146,10 @@ export function CashflowContent({
             Investments
           </span>
           <h2 className="text-3xl">
-            ${numeral(totalAnnualInvestments).format("0,0[.]00")}
+            {formatCurrency(
+              convertAmount(totalAnnualInvestments, baseCurrency),
+              selectedCurrency,
+            )}
           </h2>
         </div>
         <div className="border-t" />
@@ -149,7 +163,7 @@ export function CashflowContent({
               balance >= 0 ? "text-lime-500" : "text-orange-500",
             )}
           >
-            ${numeral(balance).format("0,0[.]00")}
+            {formatCurrency(convertAmount(balance, baseCurrency), selectedCurrency)}
           </h2>
         </div>
       </div>

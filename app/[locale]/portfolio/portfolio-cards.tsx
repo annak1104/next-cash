@@ -2,6 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { useCurrency } from "@/contexts/currency-context";
 import { formatCurrency } from "@/lib/currency-utils";
 import { cn } from "@/lib/utils";
 import { DollarSign, Zap } from "lucide-react";
@@ -37,6 +38,7 @@ export default function PortfolioCards({
   selectedPortfolioId = "all",
   onSelectPortfolio,
 }: Props) {
+  const { convertAmount, selectedCurrency } = useCurrency();
   return (
     <ScrollArea className="w-full">
       <div className="flex flex-nowrap space-x-4 p-1">
@@ -64,7 +66,10 @@ export default function PortfolioCards({
               </div>
               <div className="space-y-1">
                 <p className="text-3xl font-bold">
-                  {formatCurrency(stats.totalValue, stats.currency)}
+                  {formatCurrency(
+                    convertAmount(stats.totalValue, stats.currency),
+                    selectedCurrency,
+                  )}
                 </p>
                 <p
                   className={`text-sm ${
@@ -72,7 +77,10 @@ export default function PortfolioCards({
                   }`}
                 >
                   {stats.dailyPL >= 0 ? "+" : ""}
-                  {formatCurrency(stats.dailyPL, stats.currency)} (
+                  {formatCurrency(
+                    convertAmount(stats.dailyPL, stats.currency),
+                    selectedCurrency,
+                  )} (
                   {stats.dailyPLPercent >= 0 ? "+" : ""}
                   {stats.dailyPLPercent.toFixed(2)}%)
                 </p>
@@ -106,7 +114,10 @@ export default function PortfolioCards({
                 </div>
                 <div className="space-y-1">
                   <p className="text-3xl font-bold">
-                    {formatCurrency(portfolio.value, portfolio.currency)}
+                    {formatCurrency(
+                      convertAmount(portfolio.value, portfolio.currency),
+                      selectedCurrency,
+                    )}
                   </p>
                   <p
                     className={`text-sm ${
@@ -114,7 +125,10 @@ export default function PortfolioCards({
                     }`}
                   >
                     {portfolio.dailyPL >= 0 ? "+" : ""}
-                    {formatCurrency(portfolio.dailyPL, portfolio.currency)} (
+                    {formatCurrency(
+                      convertAmount(portfolio.dailyPL, portfolio.currency),
+                      selectedCurrency,
+                    )} (
                     {portfolio.dailyPLPercent >= 0 ? "+" : ""}
                     {portfolio.dailyPLPercent.toFixed(2)}%)
                   </p>

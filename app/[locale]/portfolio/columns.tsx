@@ -3,6 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
 
+import CurrencyAmount from "@/components/currency-amount";
 import { HoldingRow } from "@/types/HoldingRow";
 
 export const columns: ColumnDef<HoldingRow>[] = [
@@ -46,10 +47,7 @@ export const columns: ColumnDef<HoldingRow>[] = [
     header: "Price",
     cell: ({ getValue }) => {
       const price = Number(getValue());
-      if (price >= 1000) {
-        return `$${(price / 1000).toFixed(2)}K`;
-      }
-      return `$${price.toFixed(2)}`;
+      return <CurrencyAmount amount={price} fromCurrency="USD" />;
     },
   },
   {
@@ -72,7 +70,8 @@ export const columns: ColumnDef<HoldingRow>[] = [
       const val = Number(getValue());
       return (
         <span className={val >= 0 ? "text-green-500" : "text-red-500"}>
-          {val >= 0 ? "+" : ""}${Math.abs(val).toFixed(2)}
+          {val >= 0 ? "+" : ""}
+          <CurrencyAmount amount={Math.abs(val)} fromCurrency="USD" />
         </span>
       );
     },
@@ -82,21 +81,22 @@ export const columns: ColumnDef<HoldingRow>[] = [
     header: "Avg. price",
     cell: ({ getValue }) => {
       const price = Number(getValue());
-      if (price >= 1000) {
-        return `$${(price / 1000).toFixed(2)}K`;
-      }
-      return `$${price.toFixed(2)}`;
+      return <CurrencyAmount amount={price} fromCurrency="USD" />;
     },
   },
   {
     accessorKey: "invested",
     header: "Cost basis",
-    cell: ({ getValue }) => `$${Number(getValue()).toFixed(2)}`,
+    cell: ({ getValue }) => (
+      <CurrencyAmount amount={Number(getValue())} fromCurrency="USD" />
+    ),
   },
   {
     accessorKey: "marketValue",
     header: "Market value",
-    cell: ({ getValue }) => `$${Number(getValue()).toFixed(2)}`,
+    cell: ({ getValue }) => (
+      <CurrencyAmount amount={Number(getValue())} fromCurrency="USD" />
+    ),
   },
   {
     accessorKey: "unrealizedPL",
@@ -105,7 +105,8 @@ export const columns: ColumnDef<HoldingRow>[] = [
       const val = Number(getValue());
       return (
         <span className={val >= 0 ? "text-green-500" : "text-red-500"}>
-          {val >= 0 ? "+" : ""}${Math.abs(val).toFixed(2)}
+          {val >= 0 ? "+" : ""}
+          <CurrencyAmount amount={Math.abs(val)} fromCurrency="USD" />
         </span>
       );
     },

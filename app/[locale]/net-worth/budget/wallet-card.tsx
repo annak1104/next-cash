@@ -6,7 +6,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { getCurrencyFlag, formatCurrency } from "@/lib/currency-utils";
+import CurrencyAmount from "@/components/currency-amount";
+import { getCurrencyFlag } from "@/lib/currency-utils";
 import { MoreVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -36,7 +37,7 @@ export default function WalletCard({ wallet }: Props) {
       <div className="flex flex-col w-full items-center justify-between gap-2">
         <span className="text-sm font-medium">{wallet.name}</span>
         <span className="text-lg font-bold">
-          {formatCurrency(balance, wallet.currency)}
+          <CurrencyAmount amount={balance} fromCurrency={wallet.currency} />
         </span>
       </div>
 

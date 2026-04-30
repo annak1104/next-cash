@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import CurrencyAmount from "@/components/currency-amount";
 import {
   Table,
   TableBody,
@@ -12,7 +13,6 @@ import {
 import { getRecentTransactions } from "@/data/getRecentTransaction";
 import { format } from "date-fns";
 import Link from "next/link";
-import numeral from "numeral";
 
 export default async function RecentTransactions() {
   const transactions = await getRecentTransactions();
@@ -71,7 +71,10 @@ export default async function RecentTransactions() {
                   </TableCell>
                   <TableCell>{transaction.category}</TableCell>
                   <TableCell>
-                    ${numeral(transaction.amount).format("0,0[.]00")}
+                    <CurrencyAmount
+                      amount={Number(transaction.amount)}
+                      fromCurrency={transaction.walletCurrency || "USD"}
+                    />
                   </TableCell>
                 </TableRow>
               ))}

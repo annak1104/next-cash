@@ -3,6 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
+import CurrencyAmount from "@/components/currency-amount";
 import { TradeRow } from "@/data/getTrades";
 
 export const tradeColumns: ColumnDef<TradeRow>[] = [
@@ -59,19 +60,22 @@ export const tradeColumns: ColumnDef<TradeRow>[] = [
     cell: ({ getValue }) => {
       const price = Number(getValue());
       if (!Number.isFinite(price)) return "-";
-      if (price >= 1000) return `$${(price / 1000).toFixed(2)}K`;
-      return `$${price.toFixed(2)}`;
+      return <CurrencyAmount amount={price} fromCurrency="USD" />;
     },
   },
   {
     accessorKey: "fee",
     header: "Fee",
-    cell: ({ getValue }) => `$${Number(getValue() ?? 0).toFixed(2)}`,
+    cell: ({ getValue }) => (
+      <CurrencyAmount amount={Number(getValue() ?? 0)} fromCurrency="USD" />
+    ),
   },
   {
     accessorKey: "totalValue",
     header: "Total",
-    cell: ({ getValue }) => `$${Number(getValue()).toFixed(2)}`,
+    cell: ({ getValue }) => (
+      <CurrencyAmount amount={Number(getValue())} fromCurrency="USD" />
+    ),
   },
 ];
 

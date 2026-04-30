@@ -1,10 +1,12 @@
 "use client";
 
+import { formatCurrency } from "@/lib/currency-utils";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addDays, format } from "date-fns";
 import { ArrowLeft, CalendarIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Resolver, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "./ui/button";
@@ -26,6 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
+import { Spinner } from "./ui/spinner";
 import { Textarea } from "./ui/textarea";
 
 export const transferFormSchema = z
@@ -33,7 +36,9 @@ export const transferFormSchema = z
     transactionDate: z.coerce
       .date()
       .max(addDays(new Date(), 1), "Transaction date cannot be in the future"),
-    categoryId: z.coerce.number().positive("Cash Transfer category is required"),
+    categoryId: z.coerce
+      .number()
+      .positive("Cash Transfer category is required"),
     fromWalletId: z.coerce.number().positive("Please select a source account"),
     toWalletId: z.coerce
       .number()
@@ -62,6 +67,15 @@ type Props = {
   ) => Promise<void>;
 };
 
+type ConvertResponse = {
+  success: boolean;
+  result?: number;
+  error?: string;
+};
+
+const CONVERSION_DEBOUNCE_MS = 500;
+const conversionExamples = ["USD -> UAH", "EUR -> USD"];
+
 export default function TransferForm({
   cashTransferCategoryId,
   wallets,
@@ -69,6 +83,10 @@ export default function TransferForm({
   onSaveAndAddMore,
 }: Props) {
   const router = useRouter();
+  const conversionCache = useRef(new Map<string, number>());
+  const [convertedAmount, setConvertedAmount] = useState<number | null>(null);
+  const [isConverting, setIsConverting] = useState(false);
+  const [conversionError, setConversionError] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof transferFormSchema>>({
     resolver: zodResolver(transferFormSchema) as Resolver<
@@ -86,11 +104,90 @@ export default function TransferForm({
   });
 
   const fromWalletId = form.watch("fromWalletId");
+  const toWalletId = form.watch("toWalletId");
+  const amount = form.watch("amount");
+
+  const fromWallet = useMemo(
+    () => wallets.find((wallet) => wallet.id === Number(fromWalletId)),
+    [fromWalletId, wallets],
+  );
+  const toWallet = useMemo(
+    () => wallets.find((wallet) => wallet.id === Number(toWalletId)),
+    [toWalletId, wallets],
+  );
 
   // Filter out the selected "from" wallet from "to" wallet options
   const availableToWallets = wallets.filter(
     (wallet) => wallet.id !== fromWalletId,
   );
+
+  useEffect(() => {
+    const normalizedAmount = Number(amount);
+
+    if (
+      !fromWallet ||
+      !toWallet ||
+      !Number.isFinite(normalizedAmount) ||
+      normalizedAmount <= 0
+    ) {
+      setConvertedAmount(null);
+      setConversionError(null);
+      setIsConverting(false);
+      return;
+    }
+
+    const cacheKey = `${fromWallet.currency}:${toWallet.currency}:${normalizedAmount}`;
+    const cachedResult = conversionCache.current.get(cacheKey);
+
+    if (cachedResult !== undefined) {
+      setConvertedAmount(cachedResult);
+      setConversionError(null);
+      setIsConverting(false);
+      return;
+    }
+
+    const controller = new AbortController();
+    const timer = window.setTimeout(async () => {
+      setIsConverting(true);
+      setConversionError(null);
+
+      try {
+        const params = new URLSearchParams({
+          from: fromWallet.currency,
+          to: toWallet.currency,
+          amount: normalizedAmount.toString(),
+        });
+        const response = await fetch(`/api/convert?${params.toString()}`, {
+          signal: controller.signal,
+        });
+        const data = (await response.json()) as ConvertResponse;
+
+        if (!response.ok || !data.success || typeof data.result !== "number") {
+          throw new Error(data.error || "Failed to convert currency");
+        }
+
+        conversionCache.current.set(cacheKey, data.result);
+        setConvertedAmount(data.result);
+      } catch (error) {
+        if (controller.signal.aborted) {
+          return;
+        }
+
+        console.error("Failed to convert transfer amount:", error);
+        setConvertedAmount(null);
+        setConversionError("Unable to convert this amount right now.");
+      } finally {
+        if (!controller.signal.aborted) {
+          setIsConverting(false);
+        }
+      }
+    }, CONVERSION_DEBOUNCE_MS);
+
+    return () => {
+      window.clearTimeout(timer);
+      controller.abort();
+    };
+  }, [amount, fromWallet, toWallet]);
 
   return (
     <Form {...form}>
@@ -158,7 +255,7 @@ export default function TransferForm({
             <FormField
               control={form.control}
               name="categoryId"
-              render={({ field }) => (
+              render={() => (
                 <FormItem>
                   <FormLabel>Category</FormLabel>
                   <FormControl>
@@ -261,6 +358,39 @@ export default function TransferForm({
                 </FormItem>
               )}
             />
+
+            {fromWallet && toWallet && Number(amount) > 0 && (
+              <div className="bg-muted/40 text-muted-foreground rounded-md border px-3 py-2 text-sm">
+                <div className="flex items-center justify-between gap-3">
+                  <span>Destination amount</span>
+                  <span className="text-foreground font-medium">
+                    {isConverting ? (
+                      <span className="flex items-center gap-2">
+                        <Spinner />
+                        Converting
+                      </span>
+                    ) : convertedAmount !== null ? (
+                      formatCurrency(convertedAmount, toWallet.currency)
+                    ) : (
+                      "Not available"
+                    )}
+                  </span>
+                </div>
+                {conversionError ? (
+                  <p className="text-destructive mt-1">{conversionError}</p>
+                ) : (
+                  <p className="mt-1">
+                    {formatCurrency(Number(amount), fromWallet.currency)} ={" "}
+                    {convertedAmount !== null
+                      ? formatCurrency(convertedAmount, toWallet.currency)
+                      : "..."}
+                  </p>
+                )}
+                <p className="mt-1 text-xs">
+                  Examples: {conversionExamples.join(", ")}
+                </p>
+              </div>
+            )}
 
             <FormField
               control={form.control}

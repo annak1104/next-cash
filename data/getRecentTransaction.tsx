@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { categoriesTable, transactionsTable } from "@/db/schema";
+import { categoriesTable, transactionsTable, walletsTable } from "@/db/schema";
 import { auth } from "@clerk/nextjs/server";
 import { desc, eq } from "drizzle-orm";
 import "server-only";
@@ -22,6 +22,7 @@ export async function getRecentTransactions() {
       transferId: transactionsTable.transferId,
       fromWalletId: transactionsTable.fromWalletId,
       walletId: transactionsTable.walletId,
+      walletCurrency: walletsTable.currency,
     })
     .from(transactionsTable)
     .where(eq(transactionsTable.userId, userId))
@@ -29,7 +30,8 @@ export async function getRecentTransactions() {
     .leftJoin(
       categoriesTable,
       eq(transactionsTable.categoryId, categoriesTable.id),
-    );
+    )
+    .leftJoin(walletsTable, eq(transactionsTable.walletId, walletsTable.id));
 
   // Filter out duplicate transfer transactions
   // For transfers, show only the "from" wallet transaction (the outgoing one)

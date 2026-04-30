@@ -1,6 +1,7 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
+import { useCurrency } from "@/contexts/currency-context";
 import { formatCurrency } from "@/lib/currency-utils";
 import { cn } from "@/lib/utils";
 import { TrendingUp, TrendingDown } from "lucide-react";
@@ -43,6 +44,7 @@ export default function SummaryCards({
   currency,
   chartData,
 }: SummaryCardsProps) {
+  const { convertAmount, selectedCurrency } = useCurrency();
   // Prepare mini chart data (last 7 days or available data)
   const miniChartData = chartData.slice(-7).map((point) => ({
     value: point.value,
@@ -64,7 +66,7 @@ export default function SummaryCards({
                 Total Net Worth
               </h3>
               <p className="text-3xl font-bold">
-                {formatCurrency(totalNetWorth, currency)}
+                {formatCurrency(convertAmount(totalNetWorth, currency), selectedCurrency)}
               </p>
               <div className="flex items-center gap-4 text-sm">
                 <div className="flex items-center gap-1">
@@ -77,7 +79,10 @@ export default function SummaryCards({
                     )}
                   >
                     {totalNetWorthDailyPL >= 0 ? "+" : ""}
-                    {formatCurrency(totalNetWorthDailyPL, currency)} (
+                    {formatCurrency(
+                      convertAmount(totalNetWorthDailyPL, currency),
+                      selectedCurrency,
+                    )} (
                     {totalNetWorthDailyPLPercent >= 0 ? "+" : ""}
                     {totalNetWorthDailyPLPercent.toFixed(2)}%)
                   </span>
@@ -93,7 +98,10 @@ export default function SummaryCards({
                     )}
                   >
                     {totalNetWorthUnrealizedPL >= 0 ? "+" : ""}
-                    {formatCurrency(totalNetWorthUnrealizedPL, currency)} (
+                    {formatCurrency(
+                      convertAmount(totalNetWorthUnrealizedPL, currency),
+                      selectedCurrency,
+                    )} (
                     {totalNetWorthUnrealizedPLPercent >= 0 ? "+" : ""}
                     {totalNetWorthUnrealizedPLPercent.toFixed(2)}%)
                   </span>
@@ -135,7 +143,7 @@ export default function SummaryCards({
                 Investments
               </h3>
               <p className="text-3xl font-bold">
-                {formatCurrency(investments, currency)}
+                {formatCurrency(convertAmount(investments, currency), selectedCurrency)}
               </p>
               <div className="flex items-center gap-4 text-sm">
                 <div className="flex items-center gap-1">
@@ -146,7 +154,10 @@ export default function SummaryCards({
                     )}
                   >
                     {investmentsDailyPL >= 0 ? "+" : ""}
-                    {formatCurrency(investmentsDailyPL, currency)} (
+                    {formatCurrency(
+                      convertAmount(investmentsDailyPL, currency),
+                      selectedCurrency,
+                    )} (
                     {investmentsDailyPLPercent >= 0 ? "+" : ""}
                     {investmentsDailyPLPercent.toFixed(2)}%)
                   </span>
@@ -162,7 +173,10 @@ export default function SummaryCards({
                     )}
                   >
                     {investmentsUnrealizedPL >= 0 ? "+" : ""}
-                    {formatCurrency(investmentsUnrealizedPL, currency)} (
+                    {formatCurrency(
+                      convertAmount(investmentsUnrealizedPL, currency),
+                      selectedCurrency,
+                    )} (
                     {investmentsUnrealizedPLPercent >= 0 ? "+" : ""}
                     {investmentsUnrealizedPLPercent.toFixed(2)}%)
                   </span>
@@ -203,7 +217,7 @@ export default function SummaryCards({
               Budget Cash
             </h3>
             <p className="text-3xl font-bold">
-              {formatCurrency(budgetCash, currency)}
+              {formatCurrency(convertAmount(budgetCash, currency), selectedCurrency)}
             </p>
             <div className="space-y-2 text-sm">
               <div className="flex items-center justify-between">
@@ -212,7 +226,7 @@ export default function SummaryCards({
                   <span className="text-muted-foreground">Income</span>
                 </div>
                 <span className="font-medium">
-                  {formatCurrency(income, currency)}
+                  {formatCurrency(convertAmount(income, currency), selectedCurrency)}
                 </span>
               </div>
               <div className="flex items-center justify-between">
@@ -221,7 +235,7 @@ export default function SummaryCards({
                   <span className="text-muted-foreground">Expenses</span>
                 </div>
                 <span className="font-medium">
-                  {formatCurrency(expenses, currency)}
+                  {formatCurrency(convertAmount(expenses, currency), selectedCurrency)}
                 </span>
               </div>
               <div className="flex items-center justify-between">
@@ -230,7 +244,10 @@ export default function SummaryCards({
                   <span className="text-muted-foreground">Investments</span>
                 </div>
                 <span className="font-medium">
-                  {formatCurrency(investmentsAmount, currency)}
+                  {formatCurrency(
+                    convertAmount(investmentsAmount, currency),
+                    selectedCurrency,
+                  )}
                 </span>
               </div>
             </div>

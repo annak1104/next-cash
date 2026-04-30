@@ -1,8 +1,9 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import CurrencyAmount from "@/components/currency-amount";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { getCurrencyFlag, formatCurrency } from "@/lib/currency-utils";
+import { getCurrencyFlag } from "@/lib/currency-utils";
 
 type Wallet = {
   id: number;
@@ -41,7 +42,10 @@ export default function WalletsList({ wallets }: WalletsListProps) {
                   </div>
                   <div className="text-right">
                     <p className="font-bold">
-                      {formatCurrency(wallet.balance, wallet.currency)}
+                      <CurrencyAmount
+                        amount={wallet.balance}
+                        fromCurrency={wallet.currency}
+                      />
                     </p>
                   </div>
                 </div>

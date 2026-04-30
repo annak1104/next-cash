@@ -1,4 +1,4 @@
-import { formatCurrency } from "@/lib/currency-utils";
+import CurrencyAmount from "@/components/currency-amount";
 import getWallets from "@/data/getWallets";
 
 type Props = {
@@ -14,7 +14,9 @@ export default async function TotalBalance({ totalBalance }: Props) {
     <div className="space-y-4">
       <div>
         <h2 className="text-sm text-muted-foreground">Total balance</h2>
-        <p className="text-4xl font-bold">{formatCurrency(totalBalance, defaultCurrency)}</p>
+        <p className="text-4xl font-bold">
+          <CurrencyAmount amount={totalBalance} fromCurrency={defaultCurrency} />
+        </p>
       </div>
     </div>
   );

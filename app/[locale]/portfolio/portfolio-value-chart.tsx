@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/chart";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useCurrency } from "@/contexts/currency-context";
 import { formatCurrency } from "@/lib/currency-utils";
 import { cn } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
@@ -49,6 +50,7 @@ export default function PortfolioValueChart({
   unrealizedPLPercent,
   currency,
 }: Props) {
+  const { convertAmount, selectedCurrency } = useCurrency();
   const [selectedRange, setSelectedRange] = useState<TimeRange>("1W");
 
   const selectedRangeConfig = TIME_RANGES.find((r) => r.label === selectedRange);
@@ -72,7 +74,7 @@ export default function PortfolioValueChart({
           <div className="flex items-start justify-between">
             <div className="space-y-1">
               <CardTitle className="text-4xl font-bold">
-                {formatCurrency(currentValue, currency)}
+                {formatCurrency(convertAmount(currentValue, currency), selectedCurrency)}
               </CardTitle>
               <div className="flex items-center gap-4 text-sm text-muted-foreground">
                 <div className="flex items-center gap-1">
@@ -83,7 +85,10 @@ export default function PortfolioValueChart({
                     )}
                   >
                     {dailyPL >= 0 ? "+" : ""}
-                    {formatCurrency(dailyPL, currency)} (
+                    {formatCurrency(
+                      convertAmount(dailyPL, currency),
+                      selectedCurrency,
+                    )} (
                     {dailyPLPercent >= 0 ? "+" : ""}
                     {dailyPLPercent.toFixed(2)}%)
                   </span>
@@ -97,7 +102,10 @@ export default function PortfolioValueChart({
                     )}
                   >
                     {unrealizedPL >= 0 ? "+" : ""}
-                    {formatCurrency(unrealizedPL, currency)} (
+                    {formatCurrency(
+                      convertAmount(unrealizedPL, currency),
+                      selectedCurrency,
+                    )} (
                     {unrealizedPLPercent >= 0 ? "+" : ""}
                     {unrealizedPLPercent.toFixed(2)}%)
                   </span>
@@ -159,7 +167,10 @@ export default function PortfolioValueChart({
               content={
                 <ChartTooltipContent
                   formatter={(value) => {
-                    return formatCurrency(Number(value), currency);
+                    return formatCurrency(
+                      convertAmount(Number(value), currency),
+                      selectedCurrency,
+                    );
                   }}
                 />
               }
@@ -170,7 +181,10 @@ export default function PortfolioValueChart({
               strokeDasharray="3 3"
               strokeOpacity={0.5}
               label={{
-                value: formatCurrency(baselineValue, currency),
+                value: formatCurrency(
+                  convertAmount(baselineValue, currency),
+                  selectedCurrency,
+                ),
                 position: "right",
                 fill: "gray",
                 fontSize: 12,

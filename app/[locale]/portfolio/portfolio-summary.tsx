@@ -1,6 +1,7 @@
 "use client";
 
 import { ChevronDown, TrendingUp, TrendingDown } from "lucide-react";
+import { useCurrency } from "@/contexts/currency-context";
 import { formatCurrency } from "@/lib/currency-utils";
 import {
   DropdownMenu,
@@ -25,18 +26,25 @@ type Props = {
 };
 
 export default function PortfolioSummary({ stats }: Props) {
+  const { convertAmount, selectedCurrency } = useCurrency();
   return (
     <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
       <div className="space-y-2">
         <p className="text-3xl font-bold">
-          {formatCurrency(stats.totalValue, stats.currency)}
+          {formatCurrency(
+            convertAmount(stats.totalValue, stats.currency),
+            selectedCurrency,
+          )}
         </p>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <span>Portfolio cash:</span>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="h-auto p-0">
-                {formatCurrency(stats.cash, stats.currency)}
+                {formatCurrency(
+                  convertAmount(stats.cash, stats.currency),
+                  selectedCurrency,
+                )}
                 <ChevronDown className="ml-1 h-3 w-3" />
               </Button>
             </DropdownMenuTrigger>
@@ -69,7 +77,10 @@ export default function PortfolioSummary({ stats }: Props) {
             }`}
           >
             {stats.dailyPL >= 0 ? "+" : ""}
-            {formatCurrency(stats.dailyPL, stats.currency)} (
+            {formatCurrency(
+              convertAmount(stats.dailyPL, stats.currency),
+              selectedCurrency,
+            )} (
             {stats.dailyPLPercent >= 0 ? "+" : ""}
             {stats.dailyPLPercent.toFixed(2)}%) Daily P&L
           </span>
@@ -96,7 +107,10 @@ export default function PortfolioSummary({ stats }: Props) {
             }`}
           >
             {stats.unrealizedPL >= 0 ? "+" : ""}
-            {formatCurrency(stats.unrealizedPL, stats.currency)} (
+            {formatCurrency(
+              convertAmount(stats.unrealizedPL, stats.currency),
+              selectedCurrency,
+            )} (
             {stats.unrealizedPLPercent >= 0 ? "+" : ""}
             {stats.unrealizedPLPercent.toFixed(2)}%) Unrealized P&L
           </span>

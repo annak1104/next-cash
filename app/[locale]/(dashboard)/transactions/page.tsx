@@ -8,6 +8,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
+import CurrencyAmount from "@/components/currency-amount";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -22,7 +23,6 @@ import { getTransactionYearsRange } from "@/data/getTransactionYearRange";
 import { format } from "date-fns";
 import { Edit2Icon } from "lucide-react";
 import Link from "next/link";
-import numeral from "numeral";
 import z from "zod";
 import Filters from "./filters";
 
@@ -117,26 +117,9 @@ export default async function TransactionsPage({
                     badgeColor = "bg-sky-500";
                   }
 
-                  // Format amount with currency
                   const currency = transaction.walletCurrency || "USD";
-                  const currencySymbol =
-                    currency === "USD"
-                      ? "$"
-                      : currency === "UAH"
-                        ? "₴"
-                        : currency === "EUR"
-                          ? "€"
-                          : currency === "GBP"
-                            ? "£"
-                            : "$";
                   const amount = Number(transaction.amount);
-                  const formattedAmount = `${currencySymbol}${numeral(amount).format("0,0[.]00")}`;
-
-                  // Format fee
                   const fee = transaction.fee ? Number(transaction.fee) : null;
-                  const formattedFee = fee
-                    ? `${currencySymbol}${numeral(fee).format("0,0[.]00")}`
-                    : "--";
 
                   return (
                     <TableRow key={transaction.id}>
@@ -180,10 +163,14 @@ export default async function TransactionsPage({
                         )}
                       </TableCell>
                       <TableCell className="font-medium">
-                        {formattedAmount}
+                        <CurrencyAmount amount={amount} fromCurrency={currency} />
                       </TableCell>
                       <TableCell className="text-muted-foreground">
-                        {formattedFee}
+                        {fee !== null ? (
+                          <CurrencyAmount amount={fee} fromCurrency={currency} />
+                        ) : (
+                          "--"
+                        )}
                       </TableCell>
                       <TableCell>
                         <Button

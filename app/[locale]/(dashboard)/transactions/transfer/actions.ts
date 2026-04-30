@@ -1,7 +1,13 @@
 "use server";
 
 import { db } from "@/db";
-import { categoriesTable, transfersTable, transactionsTable } from "@/db/schema";
+import {
+  categoriesTable,
+  transactionsTable,
+  transfersTable,
+  walletsTable,
+} from "@/db/schema";
+import { convertCurrency } from "@/lib/currency-converter";
 import { auth } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm";
 
@@ -72,6 +78,40 @@ export const createTransferTransaction = async (data: {
   // Ensure we're using Cash Transfer category
   const cashTransferCategoryId = await getOrCreateCashTransferCategory();
 
+  const [fromWallet] = await db
+    .select({ id: walletsTable.id, currency: walletsTable.currency })
+    .from(walletsTable)
+    .where(eq(walletsTable.id, data.fromWalletId))
+    .limit(1);
+  const [toWallet] = await db
+    .select({ id: walletsTable.id, currency: walletsTable.currency })
+    .from(walletsTable)
+    .where(eq(walletsTable.id, data.toWalletId))
+    .limit(1);
+
+  if (!fromWallet || !toWallet) {
+    return {
+      error: true,
+      message: "Wallet not found",
+    };
+  }
+
+  let convertedTransferAmount: number;
+
+  try {
+    convertedTransferAmount = await convertCurrency(
+      fromWallet.currency,
+      toWallet.currency,
+      data.amount,
+    );
+  } catch (error) {
+    console.error("Failed to convert transfer amount:", error);
+    return {
+      error: true,
+      message: "Failed to convert transfer amount",
+    };
+  }
+
   // Create transfer record
   const [transfer] = await db
     .insert(transfersTable)
@@ -112,7 +152,7 @@ export const createTransferTransaction = async (data: {
     .insert(transactionsTable)
     .values({
       userId,
-      amount: data.amount.toString(),
+      amount: convertedTransferAmount.toString(),
       description: `Transfer from: ${data.description}`,
       categoryId: transferCategoryId,
       walletId: data.toWalletId,
@@ -152,4 +192,3 @@ export const createTransferTransaction = async (data: {
 export async function getCashTransferCategoryId() {
   return await getOrCreateCashTransferCategory();
 }
-
