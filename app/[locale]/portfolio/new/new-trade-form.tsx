@@ -12,7 +12,7 @@ import {
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, type Resolver, useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -83,7 +83,7 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
   const [apiPrice, setApiPrice] = useState<number | null>(null);
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(tradeSchema),
+    resolver: zodResolver(tradeSchema) as Resolver<FormValues>,
     defaultValues: {
       type: "buy",
       portfolioId: portfolios[0] ? Number(portfolios[0].id) : 0,
