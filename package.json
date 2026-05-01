@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "npx i18nexus pull && next build",
+    "build": "next build",
     "dev": "concurrently --raw \"next dev --turbo\" \"npx i18nexus listen\"",
-    "start": "npx i18nexus pull && next start",
+    "start": "next start",
     "lint": "eslint",
     "prepare": "husky"
   },
