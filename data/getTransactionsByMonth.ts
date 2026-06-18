@@ -4,6 +4,7 @@ import {
   transactionsTable,
   walletsTable,
 } from "@/db/schema";
+import { getEffectiveTransactionType } from "@/lib/transaction-utils";
 import { auth } from "@clerk/nextjs/server";
 import { format } from "date-fns";
 import { and, desc, eq, gte, inArray, lte } from "drizzle-orm";
@@ -31,6 +32,7 @@ export async function getTransactionsByMonth({
       amount: transactionsTable.amount,
       transactionDate: transactionsTable.transactionDate,
       category: categoriesTable.name,
+      categoryType: categoriesTable.type,
       transactionType: transactionsTable.transactionType,
       fee: transactionsTable.fee,
       walletId: transactionsTable.walletId,
@@ -90,10 +92,20 @@ export async function getTransactionsByMonth({
   // Filter out duplicate transfer transactions
   // For transfers, show only the "from" wallet transaction (the outgoing one)
   const seenTransferIds = new Set<number>();
+  const feeByTransferId = new Map<number, string>();
+  for (const tx of transactions) {
+    if (tx.transferId != null && tx.fee != null) {
+      feeByTransferId.set(tx.transferId, tx.fee);
+    }
+  }
+
   const filteredTransactions = transactions.filter((tx) => {
     // If it's a transfer transaction
     const transferId = tx.transferId;
     if (transferId !== null && transferId !== undefined) {
+      if (tx.fee != null) {
+        return false;
+      }
       // If we've already seen this transfer, skip it
       if (seenTransferIds.has(transferId)) {
         return false;
@@ -113,6 +125,11 @@ export async function getTransactionsByMonth({
   // Add wallet names to transactions
   return filteredTransactions.map((tx) => ({
     ...tx,
+    fee:
+      tx.transferId != null && tx.fee == null
+        ? (feeByTransferId.get(tx.transferId) ?? null)
+        : tx.fee,
+    transactionType: getEffectiveTransactionType(tx),
     fromWalletName: tx.fromWalletId ? walletMap.get(tx.fromWalletId) || null : null,
     toWalletName: tx.toWalletId ? walletMap.get(tx.toWalletId) || null : null,
   }));

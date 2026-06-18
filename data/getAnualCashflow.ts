@@ -1,7 +1,13 @@
 import { db } from "@/db";
-import { categoriesTable, transactionsTable } from "@/db/schema";
+import { categoriesTable, transactionsTable, walletsTable } from "@/db/schema";
+import { getUsdExchangeRates } from "@/lib/exchange-rates-server";
+import { convertCurrencyFromRates } from "@/lib/currency-converter";
+import {
+  getEffectiveTransactionType,
+  isCashflowTransaction,
+} from "@/lib/transaction-utils";
 import { auth } from "@clerk/nextjs/server";
-import { and, eq, sql, sum } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import "server-only";
 
 export async function getAnnualCashflow(year: number) {
@@ -11,33 +17,33 @@ export async function getAnnualCashflow(year: number) {
     return [];
   }
 
-  const month = sql`EXTRACT(MONTH FROM ${transactionsTable.transactionDate})`;
-
-  const cashflow = await db
+  const transactions = await db
     .select({
-      month,
-      totalIncome: sum(
-        sql`CASE WHEN ${categoriesTable.type} = 'income' THEN ${transactionsTable.amount} ELSE 0 END`,
-      ),
-      totalExpenses: sum(
-        sql`CASE WHEN ${categoriesTable.type} = 'expense' THEN ${transactionsTable.amount} ELSE 0 END`,
-      ),
-      totalInvestments: sum(
-        sql`CASE WHEN ${categoriesTable.name} = 'Investments' THEN ${transactionsTable.amount} ELSE 0 END`,
-      ),
+      month: sql<number>`EXTRACT(MONTH FROM ${transactionsTable.transactionDate})`,
+      amount: transactionsTable.amount,
+      transactionType: transactionsTable.transactionType,
+      transferId: transactionsTable.transferId,
+      categoryName: categoriesTable.name,
+      categoryType: categoriesTable.type,
+      walletCurrency: walletsTable.currency,
     })
     .from(transactionsTable)
     .leftJoin(
       categoriesTable,
       eq(transactionsTable.categoryId, categoriesTable.id),
     )
+    .leftJoin(walletsTable, eq(transactionsTable.walletId, walletsTable.id))
     .where(
       and(
         eq(transactionsTable.userId, userId),
         sql`EXTRACT(YEAR FROM ${transactionsTable.transactionDate}) = ${year}`,
       ),
-    )
-    .groupBy(month);
+    );
+
+  const rates = await getUsdExchangeRates().catch((error) => {
+    console.error("Failed to load exchange rates for annual cashflow:", error);
+    return { USD: 1 };
+  });
 
   const annualCashflow: {
     month: number;
@@ -47,13 +53,40 @@ export async function getAnnualCashflow(year: number) {
   }[] = [];
 
   for (let i = 1; i <= 12; i++) {
-    const monthlyCashflow = cashflow.find((cf) => Number(cf.month) === i);
     annualCashflow.push({
       month: i,
-      income: Number(monthlyCashflow?.totalIncome ?? 0),
-      expenses: Number(monthlyCashflow?.totalExpenses ?? 0),
-      investments: Number(monthlyCashflow?.totalInvestments ?? 0),
+      income: 0,
+      expenses: 0,
+      investments: 0,
     });
+  }
+
+  for (const transaction of transactions) {
+    const type = getEffectiveTransactionType({
+      transactionType: transaction.transactionType,
+      categoryType: transaction.categoryType,
+      transferId: transaction.transferId,
+    });
+
+    if (!isCashflowTransaction(type)) {
+      continue;
+    }
+
+    const monthIndex = Number(transaction.month) - 1;
+    const amountUsd = convertCurrencyFromRates(
+      Number(transaction.amount),
+      transaction.walletCurrency ?? "USD",
+      "USD",
+      rates,
+    );
+
+    if (type === "income") {
+      annualCashflow[monthIndex].income += amountUsd;
+    } else if (transaction.categoryName === "Investments") {
+      annualCashflow[monthIndex].investments += amountUsd;
+    } else {
+      annualCashflow[monthIndex].expenses += amountUsd;
+    }
   }
 
   return annualCashflow;

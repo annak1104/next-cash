@@ -101,13 +101,10 @@ export default async function TransactionsPage({
               </TableHeader>
               <TableBody>
                 {transactions.map((transaction) => {
-                  const transactionType =
-                    transaction.transactionType ||
-                    (transaction.category === "income" ? "income" : "expense");
+                  const transactionType = transaction.transactionType;
                   const isTransfer = transactionType === "transfer";
                   const isAdjustment = transactionType === "adjustment";
                   const isIncome = transactionType === "income";
-                  const isExpense = transactionType === "expense";
 
                   // Badge color logic
                   let badgeColor = "bg-orange-500"; // default expense
@@ -125,7 +122,7 @@ export default async function TransactionsPage({
                     <TableRow key={transaction.id}>
                       <TableCell>
                         <Badge className={badgeColor}>
-                          {transactionType || "expense"}
+                          {transactionType}
                         </Badge>
                       </TableCell>
                       <TableCell>

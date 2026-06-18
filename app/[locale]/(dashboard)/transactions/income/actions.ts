@@ -57,6 +57,7 @@ export const createIncomeTransaction = async (data: {
       categoryId: data.categoryId,
       walletId: data.walletId,
       transactionDate: data.transactionDate,
+      transactionType: "income",
     })
     .returning();
 
@@ -64,4 +65,3 @@ export const createIncomeTransaction = async (data: {
     id: transaction.id,
   };
 };
-

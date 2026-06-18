@@ -1,9 +1,12 @@
 "use server";
 
 import { db } from "@/db";
-import { transactionsTable } from "@/db/schema";
+import { categoriesTable, transactionsTable } from "@/db/schema";
 import { transactionSchema } from "@/validation/transactionSchema";
 import { auth } from "@clerk/nextjs/server";
+import { eq } from "drizzle-orm";
+
+const legacyTransactionSchema = transactionSchema.omit({ walletId: true });
 
 export const createTransaction = async (data: {
   amount: number;
@@ -19,7 +22,23 @@ export const createTransaction = async (data: {
       message: "Unauthorizet",
     };
   }
-  const validation = transactionSchema.safeParse(data);
+  const [category] = await db
+    .select()
+    .from(categoriesTable)
+    .where(eq(categoriesTable.id, data.categoryId))
+    .limit(1);
+
+  if (!category) {
+    return {
+      error: true,
+      message: "Invalid category",
+    };
+  }
+
+  const validation = legacyTransactionSchema.safeParse({
+    ...data,
+    transactionDate: new Date(data.transactionDate),
+  });
   if (!validation.success) {
     return {
       error: true,
@@ -34,6 +53,7 @@ export const createTransaction = async (data: {
       description: data.description,
       categoryId: data.categoryId,
       transactionDate: data.transactionDate,
+      transactionType: category.type,
     })
     .returning();
   return {

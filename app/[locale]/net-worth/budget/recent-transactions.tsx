@@ -66,7 +66,7 @@ export default async function RecentTransactions() {
                             : "bg-orange-500"
                       }
                     >
-                      {transaction.transactionType || "expense"}
+                      {transaction.transactionType}
                     </Badge>
                   </TableCell>
                   <TableCell>{transaction.category}</TableCell>

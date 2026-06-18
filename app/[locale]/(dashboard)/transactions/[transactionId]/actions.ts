@@ -1,10 +1,9 @@
 "use server";
 
 import { db } from "@/db";
-import { transactionsTable } from "@/db/schema";
+import { categoriesTable, transactionsTable } from "@/db/schema";
 import { auth } from "@clerk/nextjs/server";
 import { and, eq } from "drizzle-orm";
-import { addDays, subYears } from "date-fns";
 import { z } from "zod";
 
 // Update schema without walletId requirement (walletId is optional in DB)
@@ -44,6 +43,36 @@ export async function updateTransaction(data: {
     };
   }
 
+  const [category] = await db
+    .select()
+    .from(categoriesTable)
+    .where(eq(categoriesTable.id, data.categoryId))
+    .limit(1);
+
+  if (!category) {
+    return {
+      error: true,
+      message: "Invalid category",
+    };
+  }
+
+  const [existingTransaction] = await db
+    .select({ transactionType: transactionsTable.transactionType })
+    .from(transactionsTable)
+    .where(
+      and(
+        eq(transactionsTable.id, data.id),
+        eq(transactionsTable.userId, userId),
+      ),
+    )
+    .limit(1);
+
+  const nextTransactionType =
+    existingTransaction?.transactionType === "transfer" ||
+    existingTransaction?.transactionType === "adjustment"
+      ? existingTransaction.transactionType
+      : category.type;
+
   await db
     .update(transactionsTable)
     .set({
@@ -51,6 +80,7 @@ export async function updateTransaction(data: {
       amount: data.amount.toString(),
       transactionDate: data.transactionDate,
       categoryId: data.categoryId,
+      transactionType: nextTransactionType,
     })
     .where(
       and(

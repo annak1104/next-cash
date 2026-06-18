@@ -3,14 +3,17 @@
 import { db } from "@/db";
 import {
   categoriesTable,
-  transactionsTable,
   holdingsTable,
   portfoliosTable,
+  transactionsTable,
   tradesTable,
+  walletsTable,
 } from "@/db/schema";
+import { convertCurrencyFromRates } from "@/lib/currency-converter";
+import { getUsdExchangeRates } from "@/lib/exchange-rates-server";
 import { auth } from "@clerk/nextjs/server";
-import { and, eq, sql, lte, asc } from "drizzle-orm";
-import { format, startOfMonth, endOfMonth, eachMonthOfInterval, subMonths } from "date-fns";
+import { and, asc, eq, lte, sql } from "drizzle-orm";
+import { eachMonthOfInterval, endOfMonth, format, subMonths } from "date-fns";
 import { getCryptoPrices } from "./getCryptoPrices";
 
 export type MonthlyNetWorthData = {
@@ -36,6 +39,10 @@ export async function getMonthlyNetWorth(
   const monthsList = eachMonthOfInterval({ start: startDate, end: endDate });
 
   const results: MonthlyNetWorthData[] = [];
+  const rates = await getUsdExchangeRates().catch((error) => {
+    console.error("Failed to load exchange rates for monthly net worth:", error);
+    return { USD: 1 };
+  });
 
   const normalizeAssetType = (assetType: string | null | undefined) => {
     return assetType?.toLowerCase() === "crypto" ? "crypto" : "stock";
@@ -155,24 +162,53 @@ export async function getMonthlyNetWorth(
     if (walletIds.length > 0) {
       const cashResult = await db
         .select({
-          income: sql<number>`COALESCE(SUM(CASE WHEN ${categoriesTable.type} = 'income' THEN ${transactionsTable.amount}::numeric ELSE 0 END), 0)`,
-          expense: sql<number>`COALESCE(SUM(CASE WHEN ${categoriesTable.type} = 'expense' THEN ${transactionsTable.amount}::numeric ELSE 0 END), 0)`,
+          walletId: transactionsTable.walletId,
+          walletCurrency: walletsTable.currency,
+          income: sql<number>`COALESCE(SUM(CASE
+            WHEN (${transactionsTable.transactionType} = 'transfer' OR ${transactionsTable.transferId} IS NOT NULL)
+              AND ${transactionsTable.toWalletId} = ${transactionsTable.walletId}
+            THEN ${transactionsTable.amount}::numeric
+            WHEN (${transactionsTable.transactionType} IS NULL OR ${transactionsTable.transactionType} != 'transfer')
+              AND ${transactionsTable.transferId} IS NULL
+              AND ${categoriesTable.type} = 'income'
+            THEN ${transactionsTable.amount}::numeric
+            ELSE 0
+          END), 0)`,
+          expense: sql<number>`COALESCE(SUM(CASE
+            WHEN (${transactionsTable.transactionType} = 'transfer' OR ${transactionsTable.transferId} IS NOT NULL)
+              AND ${transactionsTable.fromWalletId} = ${transactionsTable.walletId}
+            THEN ${transactionsTable.amount}::numeric
+            WHEN (${transactionsTable.transactionType} IS NULL OR ${transactionsTable.transactionType} != 'transfer')
+              AND ${transactionsTable.transferId} IS NULL
+              AND ${categoriesTable.type} = 'expense'
+            THEN ${transactionsTable.amount}::numeric
+            ELSE 0
+          END), 0)`,
         })
         .from(transactionsTable)
         .leftJoin(
           categoriesTable,
           eq(transactionsTable.categoryId, categoriesTable.id),
         )
+        .leftJoin(walletsTable, eq(transactionsTable.walletId, walletsTable.id))
         .where(
           and(
             eq(transactionsTable.userId, userId),
             sql`${transactionsTable.walletId} IS NOT NULL`,
             lte(transactionsTable.transactionDate, monthEndStr),
           ),
-        );
+        )
+        .groupBy(transactionsTable.walletId, walletsTable.currency);
 
-      if (cashResult.length > 0) {
-        cash = Number(cashResult[0].income) - Number(cashResult[0].expense);
+      for (const walletCash of cashResult) {
+        const walletBalance =
+          Number(walletCash.income) - Number(walletCash.expense);
+        cash += convertCurrencyFromRates(
+          walletBalance,
+          walletCash.walletCurrency ?? "USD",
+          "USD",
+          rates,
+        );
       }
     }
 
@@ -313,4 +349,3 @@ export async function getMonthlyNetWorth(
 
   return results;
 }
-

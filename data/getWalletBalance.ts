@@ -17,19 +17,21 @@ export default async function getWalletBalance(
   const result = await db
     .select({
       income: sql<number>`COALESCE(SUM(CASE
-        WHEN ${transactionsTable.transactionType} = 'transfer'
+        WHEN (${transactionsTable.transactionType} = 'transfer' OR ${transactionsTable.transferId} IS NOT NULL)
           AND ${transactionsTable.toWalletId} = ${walletId}
         THEN ${transactionsTable.amount}::numeric
         WHEN (${transactionsTable.transactionType} IS NULL OR ${transactionsTable.transactionType} != 'transfer')
+          AND ${transactionsTable.transferId} IS NULL
           AND ${categoriesTable.type} = 'income'
         THEN ${transactionsTable.amount}::numeric
         ELSE 0
       END), 0)`,
       expense: sql<number>`COALESCE(SUM(CASE
-        WHEN ${transactionsTable.transactionType} = 'transfer'
+        WHEN (${transactionsTable.transactionType} = 'transfer' OR ${transactionsTable.transferId} IS NOT NULL)
           AND ${transactionsTable.fromWalletId} = ${walletId}
         THEN ${transactionsTable.amount}::numeric
         WHEN (${transactionsTable.transactionType} IS NULL OR ${transactionsTable.transactionType} != 'transfer')
+          AND ${transactionsTable.transferId} IS NULL
           AND ${categoriesTable.type} = 'expense'
         THEN ${transactionsTable.amount}::numeric
         ELSE 0
@@ -66,19 +68,21 @@ export async function getWalletBalances(): Promise<Record<number, number>> {
     .select({
       walletId: transactionsTable.walletId,
       income: sql<number>`COALESCE(SUM(CASE
-        WHEN ${transactionsTable.transactionType} = 'transfer'
+        WHEN (${transactionsTable.transactionType} = 'transfer' OR ${transactionsTable.transferId} IS NOT NULL)
           AND ${transactionsTable.toWalletId} = ${transactionsTable.walletId}
         THEN ${transactionsTable.amount}::numeric
         WHEN (${transactionsTable.transactionType} IS NULL OR ${transactionsTable.transactionType} != 'transfer')
+          AND ${transactionsTable.transferId} IS NULL
           AND ${categoriesTable.type} = 'income'
         THEN ${transactionsTable.amount}::numeric
         ELSE 0
       END), 0)`,
       expense: sql<number>`COALESCE(SUM(CASE
-        WHEN ${transactionsTable.transactionType} = 'transfer'
+        WHEN (${transactionsTable.transactionType} = 'transfer' OR ${transactionsTable.transferId} IS NOT NULL)
           AND ${transactionsTable.fromWalletId} = ${transactionsTable.walletId}
         THEN ${transactionsTable.amount}::numeric
         WHEN (${transactionsTable.transactionType} IS NULL OR ${transactionsTable.transactionType} != 'transfer')
+          AND ${transactionsTable.transferId} IS NULL
           AND ${categoriesTable.type} = 'expense'
         THEN ${transactionsTable.amount}::numeric
         ELSE 0

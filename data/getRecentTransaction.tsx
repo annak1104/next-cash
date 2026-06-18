@@ -1,5 +1,6 @@
 import { db } from "@/db";
 import { categoriesTable, transactionsTable, walletsTable } from "@/db/schema";
+import { getEffectiveTransactionType } from "@/lib/transaction-utils";
 import { auth } from "@clerk/nextjs/server";
 import { desc, eq } from "drizzle-orm";
 import "server-only";
@@ -18,7 +19,9 @@ export async function getRecentTransactions() {
       amount: transactionsTable.amount,
       transactionDate: transactionsTable.transactionDate,
       category: categoriesTable.name,
+      categoryType: categoriesTable.type,
       transactionType: transactionsTable.transactionType,
+      fee: transactionsTable.fee,
       transferId: transactionsTable.transferId,
       fromWalletId: transactionsTable.fromWalletId,
       walletId: transactionsTable.walletId,
@@ -39,6 +42,9 @@ export async function getRecentTransactions() {
   const filteredTransactions = transactions.filter((tx) => {
     // If it's a transfer transaction
     if (tx.transferId) {
+      if (tx.fee != null) {
+        return false;
+      }
       // If we've already seen this transfer, skip it
       if (seenTransferIds.has(tx.transferId)) {
         return false;
@@ -55,5 +61,8 @@ export async function getRecentTransactions() {
     return true;
   });
 
-  return filteredTransactions.slice(0, 5);
+  return filteredTransactions.slice(0, 5).map((transaction) => ({
+    ...transaction,
+    transactionType: getEffectiveTransactionType(transaction),
+  }));
 }
