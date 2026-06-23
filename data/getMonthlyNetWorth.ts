@@ -5,15 +5,15 @@ import {
   categoriesTable,
   holdingsTable,
   portfoliosTable,
-  transactionsTable,
   tradesTable,
+  transactionsTable,
   walletsTable,
 } from "@/db/schema";
 import { convertCurrencyFromRates } from "@/lib/currency-converter";
 import { getUsdExchangeRates } from "@/lib/exchange-rates-server";
 import { auth } from "@clerk/nextjs/server";
-import { and, asc, eq, lte, sql } from "drizzle-orm";
 import { eachMonthOfInterval, endOfMonth, format, subMonths } from "date-fns";
+import { and, asc, eq, lte, sql } from "drizzle-orm";
 import { getCryptoPrices } from "./getCryptoPrices";
 
 export type MonthlyNetWorthData = {
@@ -24,6 +24,8 @@ export type MonthlyNetWorthData = {
   crypto: number;
   total: number;
 };
+
+type AssetClass = "crypto" | "stock";
 
 export async function getMonthlyNetWorth(
   months: number = 12,
@@ -40,13 +42,23 @@ export async function getMonthlyNetWorth(
 
   const results: MonthlyNetWorthData[] = [];
   const rates = await getUsdExchangeRates().catch((error) => {
-    console.error("Failed to load exchange rates for monthly net worth:", error);
+    console.error(
+      "Failed to load exchange rates for monthly net worth:",
+      error,
+    );
     return { USD: 1 };
   });
 
-  const normalizeAssetType = (assetType: string | null | undefined) => {
+  const normalizeAssetType = (
+    assetType: string | null | undefined,
+  ): AssetClass => {
     return assetType?.toLowerCase() === "crypto" ? "crypto" : "stock";
   };
+  const getAssetKey = (
+    portfolioId: number,
+    symbol: string,
+    assetType: string | null | undefined,
+  ) => `${portfolioId}-${symbol}-${normalizeAssetType(assetType)}`;
 
   // Get all wallets
   const wallets = await db
@@ -132,11 +144,14 @@ export async function getMonthlyNetWorth(
 
   const cryptoPrices = await getCryptoPrices(cryptoIds);
 
-  // Build current prices map - use actual assetType from DB, not normalized
+  // Build current prices map for all assets in current holdings.
   const currentPrices = new Map<string, number>();
   for (const holding of currentHoldings) {
-    // Use actual assetType from database for the key to match trades
-    const key = `${holding.portfolioId}-${holding.symbol}-${holding.assetType}`;
+    const key = getAssetKey(
+      holding.portfolioId,
+      holding.symbol,
+      holding.assetType,
+    );
     let price = Number(holding.currentPrice) || Number(holding.avgPrice) || 0;
 
     if (holding.assetType === "crypto" && holding.coinGeckoId) {
@@ -145,10 +160,31 @@ export async function getMonthlyNetWorth(
         price = priceData.price;
       }
     }
-    // For stocks, price is already set from currentPrice or avgPrice above
-
     currentPrices.set(key, price);
   }
+
+  const tradedAssetKeys = new Set(
+    allTrades.map((trade) =>
+      getAssetKey(trade.portfolioId, trade.symbol, trade.assetType),
+    ),
+  );
+
+  const getCurrentHoldingPrice = (
+    holding: (typeof currentHoldings)[number],
+  ) => {
+    const key = getAssetKey(
+      holding.portfolioId,
+      holding.symbol,
+      holding.assetType,
+    );
+
+    return (
+      currentPrices.get(key) ||
+      Number(holding.currentPrice) ||
+      Number(holding.avgPrice) ||
+      0
+    );
+  };
 
   // Process each month
   for (const monthDate of monthsList) {
@@ -238,8 +274,11 @@ export async function getMonthlyNetWorth(
           break;
         }
 
-        // Use actual assetType from database, not normalized
-        const key = `${trade.portfolioId}-${trade.symbol}-${trade.assetType}`;
+        const key = getAssetKey(
+          trade.portfolioId,
+          trade.symbol,
+          trade.assetType,
+        );
         const quantity = Number(trade.quantity);
         const price = Number(trade.price);
         const normalizedType = normalizeAssetType(trade.assetType);
@@ -259,9 +298,11 @@ export async function getMonthlyNetWorth(
         const holding = holdingsState.get(key)!;
 
         if (trade.type === "buy") {
-          const totalCost = holding.quantity * holding.avgPrice + quantity * price;
+          const totalCost =
+            holding.quantity * holding.avgPrice + quantity * price;
           const totalQuantity = holding.quantity + quantity;
-          holding.avgPrice = totalQuantity > 0 ? totalCost / totalQuantity : price;
+          holding.avgPrice =
+            totalQuantity > 0 ? totalCost / totalQuantity : price;
           holding.quantity = totalQuantity;
           holding.lastPrice = price;
         } else if (trade.type === "sell") {
@@ -276,26 +317,21 @@ export async function getMonthlyNetWorth(
       for (const [key, holding] of holdingsState.entries()) {
         if (holding.quantity <= 0) continue;
 
-        // Use last trade price or current price as fallback
         let price = holding.lastPrice;
         const currentPrice = currentPrices.get(key);
         if (currentPrice && currentPrice > 0) {
           price = currentPrice;
         }
 
-        // If still no price, try to get from current holdings directly
+        // If still no price, try to get from current holdings directly.
         if (price <= 0) {
-          // Extract assetType from key (it's the last part after the last dash)
-          const keyParts = key.split("-");
-          const assetTypeFromKey = keyParts[keyParts.length - 1];
-          
           for (const ch of currentHoldings) {
             if (
+              getAssetKey(ch.portfolioId, ch.symbol, ch.assetType) === key &&
               ch.portfolioId === holding.portfolioId &&
-              ch.symbol === holding.symbol &&
-              ch.assetType === assetTypeFromKey
+              ch.symbol === holding.symbol
             ) {
-              price = Number(ch.currentPrice) || Number(ch.avgPrice) || 0;
+              price = getCurrentHoldingPrice(ch);
               break;
             }
           }
@@ -309,21 +345,35 @@ export async function getMonthlyNetWorth(
           crypto += value;
         }
       }
+
+      // Include current holdings that have no trade rows. This covers imported
+      // or previously created positions where the holding table is the only
+      // available source of truth for the asset value.
+      for (const holding of currentHoldings) {
+        const key = getAssetKey(
+          holding.portfolioId,
+          holding.symbol,
+          holding.assetType,
+        );
+        if (tradedAssetKeys.has(key)) continue;
+
+        const assetType = normalizeAssetType(holding.assetType);
+        const quantity = Number(holding.quantity);
+        const price = getCurrentHoldingPrice(holding);
+        const value = quantity * price;
+
+        if (assetType === "stock") {
+          stocks += value;
+        } else {
+          crypto += value;
+        }
+      }
     } else if (currentHoldings.length > 0) {
       // No trades, use current holdings directly
       for (const holding of currentHoldings) {
         const assetType = normalizeAssetType(holding.assetType);
         const quantity = Number(holding.quantity);
-        let price = Number(holding.currentPrice) || Number(holding.avgPrice) || 0;
-
-        // For crypto, try to get latest price from API
-        if (assetType === "crypto" && holding.coinGeckoId) {
-          const priceData = cryptoPrices[holding.coinGeckoId];
-          if (priceData) {
-            price = priceData.price;
-          }
-        }
-        // For stocks, use currentPrice or avgPrice (already set above)
+        const price = getCurrentHoldingPrice(holding);
 
         const value = quantity * price;
 

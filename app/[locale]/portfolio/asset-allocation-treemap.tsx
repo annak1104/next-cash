@@ -1,12 +1,10 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useCurrency } from "@/contexts/currency-context";
 import { formatCurrency } from "@/lib/currency-utils";
-import { cn } from "@/lib/utils";
-import { Grid2x2, RotateCcw } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Treemap, ResponsiveContainer } from "recharts";
 import { HoldingRow } from "@/types/HoldingRow";
+import { ResponsiveContainer, Tooltip, Treemap } from "recharts";
 
 type Props = {
   holdings: HoldingRow[];
@@ -35,9 +33,26 @@ function getColorForChange(change24h: number): string {
 }
 
 // Custom content renderer for treemap cells
-const CustomCell = (props: any) => {
-  const { x, y, width, height, payload } = props;
-  if (!payload || !x || !y || !width || !height) return null;
+type CustomCellProps = {
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+  payload?: TreemapData;
+};
+
+const CustomCell = ({ x, y, width, height, payload }: CustomCellProps) => {
+  if (
+    !payload ||
+    typeof x !== "number" ||
+    typeof y !== "number" ||
+    typeof width !== "number" ||
+    typeof height !== "number" ||
+    width <= 0 ||
+    height <= 0
+  ) {
+    return null;
+  }
 
   const fontSize = Math.min(width / 6, height / 3, 14);
   const isLargeEnough = width > 80 && height > 40;
@@ -88,6 +103,7 @@ export default function AssetAllocationTreemap({
   holdings,
   currency,
 }: Props) {
+  const { convertAmount, selectedCurrency } = useCurrency();
   // Prepare treemap data
   const treemapData: TreemapData[] = holdings
     .filter((h) => h.marketValue > 0)
@@ -118,20 +134,10 @@ export default function AssetAllocationTreemap({
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle>Asset Allocation Map</CardTitle>
-          <div className="flex gap-2">
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <Grid2x2 className="h-4 w-4" />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <RotateCcw className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+        <CardTitle>Asset Allocation Map</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="h-[400px] w-full">
+        <div className="h-[320px] w-full sm:h-[400px]">
           <ResponsiveContainer width="100%" height="100%">
             <Treemap
               data={treemapData}
@@ -139,7 +145,33 @@ export default function AssetAllocationTreemap({
               stroke="#fff"
               fill="#8884d8"
               content={<CustomCell />}
-            />
+            >
+              <Tooltip
+                cursor={{ stroke: "hsl(var(--border))", strokeWidth: 1 }}
+                content={({ active, payload }) => {
+                  const item = payload?.[0]?.payload as TreemapData | undefined;
+
+                  if (!active || !item) {
+                    return null;
+                  }
+
+                  return (
+                    <div className="rounded-lg border bg-background px-3 py-2 text-xs shadow-xl">
+                      <div className="font-medium">{item.name}</div>
+                      <div className="mt-1 text-muted-foreground">
+                        {formatCurrency(
+                          convertAmount(item.value, currency),
+                          selectedCurrency,
+                        )}
+                      </div>
+                      <div className="text-muted-foreground">
+                        {item.allocation.toFixed(1)}% allocation
+                      </div>
+                    </div>
+                  );
+                }}
+              />
+            </Treemap>
           </ResponsiveContainer>
         </div>
       </CardContent>

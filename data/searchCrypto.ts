@@ -2,6 +2,15 @@
 
 const COINGECKO_API = "https://api.coingecko.com/api/v3";
 
+type CoinGeckoSearchResponse = {
+  coins?: Array<{
+    id?: string;
+    symbol?: string;
+    name?: string;
+    thumb?: string;
+  }>;
+};
+
 export async function searchCrypto(
   query: string,
 ): Promise<Array<{ id: string; symbol: string; name: string; image: string }>> {
@@ -20,14 +29,16 @@ export async function searchCrypto(
       return [];
     }
 
-    const data = await res.json();
+    const data = (await res.json()) as CoinGeckoSearchResponse;
     const coins =
-      data?.coins?.map((coin: any) => ({
-        id: coin.id as string,
-        symbol: (coin.symbol as string).toUpperCase(),
-        name: coin.name as string,
-        image: coin.thumb as string,
-      })) ?? [];
+      data.coins
+        ?.filter((coin) => coin.id && coin.symbol && coin.name)
+        .map((coin) => ({
+          id: coin.id as string,
+          symbol: (coin.symbol as string).toUpperCase(),
+          name: coin.name as string,
+          image: coin.thumb ?? "",
+        })) ?? [];
 
     return coins;
   } catch (error) {
@@ -35,7 +46,3 @@ export async function searchCrypto(
     return [];
   }
 }
-
-
-
-

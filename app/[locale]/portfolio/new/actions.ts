@@ -12,8 +12,9 @@ import {
 import { tradeSchema } from "@/validation/tradeSchema";
 import { auth } from "@clerk/nextjs/server";
 import { and, eq } from "drizzle-orm";
+import { z } from "zod";
 
-export async function createAssetTrade(rawData: any) {
+export async function createAssetTrade(rawData: z.input<typeof tradeSchema>) {
   const { userId } = await auth();
 
   if (!userId) {
@@ -268,5 +269,4 @@ export async function createAssetTrade(rawData: any) {
     error: false,
   };
 }
-
 

@@ -47,7 +47,6 @@ export async function getPortfolioHoldings(
 
     const marketValue = quantity * currentPrice;
     const unrealizedPL = marketValue - costBasis;
-    const unrealizedPLPercent = costBasis > 0 ? (unrealizedPL / costBasis) * 100 : 0;
 
     // Calculate daily P&L (approximation based on 24h change)
     const previousValue = marketValue / (1 + change24h / 100);
@@ -82,4 +81,3 @@ export async function getPortfolioHoldings(
         : 0,
   }));
 }
-

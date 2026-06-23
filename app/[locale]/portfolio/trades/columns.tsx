@@ -13,7 +13,6 @@ export const tradeColumns: ColumnDef<TradeRow>[] = [
     cell: ({ getValue }) => {
       const type = getValue() as TradeRow["type"];
       const isBuy = type === "buy";
-      const isSell = type === "sell";
       const color =
         type === "revaluation"
           ? "bg-slate-200 text-slate-900"
@@ -78,5 +77,4 @@ export const tradeColumns: ColumnDef<TradeRow>[] = [
     ),
   },
 ];
-
 

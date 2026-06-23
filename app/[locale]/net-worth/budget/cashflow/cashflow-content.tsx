@@ -45,10 +45,22 @@ export function CashflowContent({
     0,
   );
   const balance = totalAnnualIncome - totalAnnualExpenses - totalAnnualInvestments;
+  const maxMonthlyValue = Math.max(
+    0,
+    ...annualCashflow.flatMap((month) => [
+      convertAmount(month.income, baseCurrency),
+      convertAmount(month.expenses, baseCurrency),
+      convertAmount(month.investments, baseCurrency),
+    ]),
+  );
+  const yDomain: [number, number] = [
+    0,
+    maxMonthlyValue > 0 ? maxMonthlyValue * 1.12 : 1,
+  ];
 
   return (
-    <div className="flex flex-col sm:flex-row">
-      <ScrollArea className="w-89 whitespace-nowrap md:w-full">
+    <div className="flex flex-col gap-6 sm:flex-row">
+      <ScrollArea className="w-full whitespace-nowrap">
         <ChartContainer
           config={{
             month: {
@@ -67,26 +79,42 @@ export function CashflowContent({
               color: "#06b6d4",
             },
           }}
-          className="h-[300px] w-full"
+          className="h-[320px] min-w-[640px] sm:min-w-0"
         >
-          <BarChart data={annualCashflow}>
+          <BarChart
+            data={annualCashflow.map((month) => ({
+              ...month,
+              income: convertAmount(month.income, baseCurrency),
+              expenses: convertAmount(month.expenses, baseCurrency),
+              investments: convertAmount(month.investments, baseCurrency),
+            }))}
+            barCategoryGap="18%"
+            margin={{ top: 8, right: 8, bottom: 0, left: 0 }}
+          >
             <CartesianGrid vertical={false} />
             <YAxis
-              tickFormatter={(value) => {
-                const converted = convertAmount(Number(value), baseCurrency);
-                return `${selectedCurrency} ${numeral(converted).format("0,0")}`;
-              }}
+              domain={yDomain}
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              width={64}
+              tickFormatter={(value) =>
+                `${selectedCurrency} ${numeral(value).format("0.[0]a")}`
+              }
             />
             <XAxis
+              dataKey="month"
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
               tickFormatter={(value) => {
-                return format(new Date(today.getFullYear(), value, 1), "MMM");
+                return format(new Date(today.getFullYear(), value - 1, 1), "MMM");
               }}
             />
             <ChartTooltip
               content={
                 <ChartTooltipContent
-                  labelFormatter={(value, payload) => {
-                    console.log({ value, payload });
+                  labelFormatter={(_, payload) => {
                     const month = payload[0]?.payload?.month;
                     return (
                       <div>
@@ -97,6 +125,10 @@ export function CashflowContent({
                       </div>
                     );
                   }}
+                  formatter={(value, name) => [
+                    formatCurrency(Number(value), selectedCurrency),
+                    String(name),
+                  ]}
                 />
               }
             />
@@ -116,7 +148,7 @@ export function CashflowContent({
         </ChartContainer>
         <ScrollBar orientation="horizontal" />
       </ScrollArea>
-      <div className="flex flex-col justify-center gap-4 border-l px-4">
+      <div className="flex flex-col justify-center gap-4 border-t pt-4 sm:border-l sm:border-t-0 sm:px-4 sm:pt-0">
         <div>
           <span className="text-muted-foreground text-sm font-bold">
             Income

@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addDays, format } from "date-fns";
 import { ArrowLeft, CalendarIcon } from "lucide-react";
-import { Resolver, useForm } from "react-hook-form";
+import { Resolver, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "./ui/button";
 import { Calendar } from "./ui/calendar";
@@ -70,6 +70,10 @@ export default function AdjustmentForm({
   });
 
   const selectedWalletId = form.watch("walletId");
+  const newBalance = useWatch({
+    control: form.control,
+    name: "newBalance",
+  });
   const selectedWallet = wallets.find((w) => w.id === selectedWalletId);
   const currentBalance = selectedWallet?.balance ?? 0;
 
@@ -187,8 +191,7 @@ export default function AdjustmentForm({
                   </FormControl>
                   {selectedWallet && (
                     <p className="text-sm text-muted-foreground">
-                      Adjustment:{" "}
-                      {(form.watch("newBalance") - currentBalance).toFixed(2)}{" "}
+                      Adjustment: {(newBalance - currentBalance).toFixed(2)}{" "}
                       {selectedWallet.currency}
                     </p>
                   )}
@@ -238,4 +241,3 @@ export default function AdjustmentForm({
     </Form>
   );
 }
-

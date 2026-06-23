@@ -10,10 +10,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useCurrency } from "@/contexts/currency-context";
 import { formatCurrency } from "@/lib/currency-utils";
 import { cn } from "@/lib/utils";
-import { format, parseISO } from "date-fns";
-import { useState } from "react";
-import { Area, AreaChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from "recharts";
+import { format, isAfter, parseISO, startOfYear, subDays } from "date-fns";
 import numeral from "numeral";
+import { useState } from "react";
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  ReferenceLine,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 type PortfolioValuePoint = {
   date: string;
@@ -32,14 +39,44 @@ type Props = {
 
 type TimeRange = "1D" | "1W" | "1M" | "6M" | "YTD" | "1Y";
 
-const TIME_RANGES: { label: TimeRange; days: number }[] = [
+const TIME_RANGES: { label: TimeRange; days?: number }[] = [
   { label: "1D", days: 1 },
   { label: "1W", days: 7 },
   { label: "1M", days: 30 },
   { label: "6M", days: 180 },
-  { label: "YTD", days: 365 }, // Approximate
+  { label: "YTD" },
   { label: "1Y", days: 365 },
 ];
+
+function getRangeStart(range: TimeRange) {
+  const today = new Date();
+
+  if (range === "YTD") {
+    return startOfYear(today);
+  }
+
+  const days = TIME_RANGES.find((item) => item.label === range)?.days ?? 7;
+  return subDays(today, days);
+}
+
+function getValueDomain(values: number[]): [number, number] {
+  const finiteValues = values.filter(Number.isFinite);
+
+  if (finiteValues.length === 0) {
+    return [0, 1];
+  }
+
+  const min = Math.min(...finiteValues);
+  const max = Math.max(...finiteValues);
+
+  if (min === max) {
+    const padding = Math.max(Math.abs(max) * 0.08, max === 0 ? 1 : 0.01);
+    return [Math.max(0, min - padding), max + padding];
+  }
+
+  const padding = Math.max((max - min) * 0.12, Math.abs(max) * 0.01, 0.01);
+  return [Math.max(0, min - padding), max + padding];
+}
 
 export default function PortfolioValueChart({
   data,
@@ -53,30 +90,49 @@ export default function PortfolioValueChart({
   const { convertAmount, selectedCurrency } = useCurrency();
   const [selectedRange, setSelectedRange] = useState<TimeRange>("1W");
 
-  const selectedRangeConfig = TIME_RANGES.find((r) => r.label === selectedRange);
-  const filteredData = data.slice(-(selectedRangeConfig?.days || 7));
+  const rangeStart = getRangeStart(selectedRange);
+  const filteredData = data.filter((point) => {
+    const pointDate = parseISO(point.date);
+    return isAfter(pointDate, rangeStart) || pointDate.toDateString() === rangeStart.toDateString();
+  });
+  const visibleData =
+    filteredData.length > 0
+      ? filteredData
+      : currentValue > 0
+        ? [
+            {
+              date: format(subDays(new Date(), 1), "yyyy-MM-dd"),
+              value: currentValue,
+            },
+            { date: format(new Date(), "yyyy-MM-dd"), value: currentValue },
+          ]
+        : [];
 
   // Calculate baseline (first value in range)
   const baselineValue =
-    filteredData.length > 0 ? filteredData[0].value : currentValue;
+    visibleData.length > 0 ? visibleData[0].value : currentValue;
+  const baselineDisplayValue = convertAmount(baselineValue, currency);
 
   // Format data for chart
-  const chartData = filteredData.map((point) => ({
+  const chartData = visibleData.map((point) => ({
     date: point.date,
     value: point.value,
+    displayValue: convertAmount(point.value, currency),
     formattedDate: format(parseISO(point.date), "MMM dd"),
+    tooltipDate: format(parseISO(point.date), "MMM dd, yyyy"),
   }));
+  const valueDomain = getValueDomain(chartData.map((point) => point.displayValue));
 
   return (
     <Card>
       <CardHeader>
         <div className="flex flex-col gap-4">
-          <div className="flex items-start justify-between">
-            <div className="space-y-1">
-              <CardTitle className="text-4xl font-bold">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div className="min-w-0 space-y-1">
+              <CardTitle className="break-words text-3xl font-bold sm:text-4xl">
                 {formatCurrency(convertAmount(currentValue, currency), selectedCurrency)}
               </CardTitle>
-              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+              <div className="flex flex-col gap-2 text-sm text-muted-foreground sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
                 <div className="flex items-center gap-1">
                   <span
                     className={cn(
@@ -113,7 +169,7 @@ export default function PortfolioValueChart({
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-1 rounded-lg border p-1">
+            <div className="flex w-full items-center gap-1 overflow-x-auto rounded-lg border p-1 sm:w-fit">
               {TIME_RANGES.map((range) => (
                 <Button
                   key={range.label}
@@ -130,75 +186,89 @@ export default function PortfolioValueChart({
         </div>
       </CardHeader>
       <CardContent>
-        <ChartContainer
-          config={{
-            value: {
-              label: "Portfolio Value",
-              color: "hsl(var(--chart-1))",
-            },
-          }}
-          className="h-[300px] w-full"
-        >
-          <AreaChart data={chartData}>
-            <defs>
-              <linearGradient id="valueGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="rgb(99, 102, 241)" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="rgb(99, 102, 241)" stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-            <XAxis
-              dataKey="formattedDate"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              className="text-xs"
-            />
-            <YAxis
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              className="text-xs"
-              tickFormatter={(value) => {
-                return `$${numeral(value).format("0.0a")}`;
-              }}
-            />
-            <ChartTooltip
-              content={
-                <ChartTooltipContent
-                  formatter={(value) => {
-                    return formatCurrency(
-                      convertAmount(Number(value), currency),
-                      selectedCurrency,
-                    );
-                  }}
-                />
-              }
-            />
-            <ReferenceLine
-              y={baselineValue}
-              stroke="gray"
-              strokeDasharray="3 3"
-              strokeOpacity={0.5}
-              label={{
-                value: formatCurrency(
-                  convertAmount(baselineValue, currency),
-                  selectedCurrency,
-                ),
-                position: "right",
-                fill: "gray",
-                fontSize: 12,
-              }}
-            />
-            <Area
-              type="monotone"
-              dataKey="value"
-              stroke="rgb(99, 102, 241)"
-              strokeWidth={2}
-              fill="url(#valueGradient)"
-            />
-          </AreaChart>
-        </ChartContainer>
+        {chartData.length === 0 ? (
+          <div className="flex h-[300px] items-center justify-center rounded-md border border-dashed text-sm text-muted-foreground">
+            No portfolio history yet
+          </div>
+        ) : (
+          <ChartContainer
+            config={{
+              displayValue: {
+                label: "Portfolio Value",
+                color: "rgb(99, 102, 241)",
+              },
+            }}
+            className="h-[320px] w-full"
+          >
+            <AreaChart
+              data={chartData}
+              margin={{ top: 12, right: 8, bottom: 0, left: 0 }}
+            >
+              <defs>
+                <linearGradient id="valueGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop
+                    offset="5%"
+                    stopColor="rgb(99, 102, 241)"
+                    stopOpacity={0.3}
+                  />
+                  <stop
+                    offset="95%"
+                    stopColor="rgb(99, 102, 241)"
+                    stopOpacity={0}
+                  />
+                </linearGradient>
+              </defs>
+              <CartesianGrid vertical={false} strokeDasharray="3 3" />
+              <XAxis
+                dataKey="formattedDate"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                minTickGap={28}
+                interval="preserveStartEnd"
+                className="text-xs"
+              />
+              <YAxis
+                domain={valueDomain}
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                width={56}
+                className="text-xs"
+                tickFormatter={(value) =>
+                  `${selectedCurrency} ${numeral(value).format("0.[0]a")}`
+                }
+              />
+              <ChartTooltip
+                content={
+                  <ChartTooltipContent
+                    labelFormatter={(_, payload) =>
+                      payload?.[0]?.payload?.tooltipDate ?? ""
+                    }
+                    formatter={(value) =>
+                      formatCurrency(Number(value), selectedCurrency)
+                    }
+                  />
+                }
+              />
+              <ReferenceLine
+                y={baselineDisplayValue}
+                stroke="rgb(107, 114, 128)"
+                strokeDasharray="3 3"
+                strokeOpacity={0.55}
+              />
+              <Area
+                type="monotone"
+                dataKey="displayValue"
+                stroke="rgb(99, 102, 241)"
+                strokeWidth={2.5}
+                fill="url(#valueGradient)"
+                dot={false}
+                activeDot={{ r: 4 }}
+              />
+            </AreaChart>
+          </ChartContainer>
+        )}
       </CardContent>
     </Card>
   );

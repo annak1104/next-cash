@@ -32,7 +32,6 @@ export async function getPortfolioHistory(
   }
 
   const endDate = new Date();
-  const startDate = subDays(endDate, days);
 
   // Get all portfolios if portfolioId is not specified
   const portfolioWhereConditions = [eq(portfoliosTable.userId, userId)];
@@ -50,8 +49,6 @@ export async function getPortfolioHistory(
   if (portfolios.length === 0) {
     return [];
   }
-
-  const portfolioIds = portfolios.map((p) => p.id);
 
   // Get ALL trades up to endDate to reconstruct state
   // We need trades from before startDate too to know initial holdings
@@ -257,7 +254,6 @@ export async function getPortfolioHistory(
             // Estimate: if we know the current price and 24h change,
             // and we have a last trade price, interpolate
             const priceDiff = currentPrice - lastKnownPrice;
-            const daysSinceLastTrade = daysFromEnd; // Approximation
             // Simple linear interpolation
             price = lastKnownPrice + (priceDiff * (daysFromEnd / (daysFromEnd + 1)));
           } else {

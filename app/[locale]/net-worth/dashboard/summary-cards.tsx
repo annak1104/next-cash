@@ -5,7 +5,7 @@ import { useCurrency } from "@/contexts/currency-context";
 import { formatCurrency } from "@/lib/currency-utils";
 import { cn } from "@/lib/utils";
 import { TrendingUp, TrendingDown } from "lucide-react";
-import { Area, AreaChart, ResponsiveContainer } from "recharts";
+import { Area, AreaChart, ResponsiveContainer, YAxis } from "recharts";
 
 type SummaryCardsProps = {
   totalNetWorth: number;
@@ -25,6 +25,25 @@ type SummaryCardsProps = {
   currency: string;
   chartData: Array<{ date: string; value: number }>;
 };
+
+function getSparklineDomain(values: number[]): [number, number] {
+  const finiteValues = values.filter(Number.isFinite);
+
+  if (finiteValues.length === 0) {
+    return [0, 1];
+  }
+
+  const min = Math.min(...finiteValues);
+  const max = Math.max(...finiteValues);
+
+  if (min === max) {
+    const padding = Math.max(Math.abs(max) * 0.08, max === 0 ? 1 : 0.01);
+    return [Math.max(0, min - padding), max + padding];
+  }
+
+  const padding = Math.max((max - min) * 0.16, Math.abs(max) * 0.01, 0.01);
+  return [Math.max(0, min - padding), max + padding];
+}
 
 export default function SummaryCards({
   totalNetWorth,
@@ -54,6 +73,12 @@ export default function SummaryCards({
   const totalNetWorthChartData = chartData.slice(-7).map((point) => ({
     value: point.value + (totalNetWorth - investments),
   }));
+  const investmentsDomain = getSparklineDomain(
+    miniChartData.map((point) => point.value),
+  );
+  const totalNetWorthDomain = getSparklineDomain(
+    totalNetWorthChartData.map((point) => point.value),
+  );
 
   return (
     <div className="grid gap-4 md:grid-cols-3">
@@ -112,6 +137,35 @@ export default function SummaryCards({
             <div className="w-24 h-16 ml-4">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={totalNetWorthChartData}>
+                  <defs>
+                    <linearGradient
+                      id="totalNetWorthSparkline"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop
+                        offset="0%"
+                        stopColor={
+                          totalNetWorthDailyPL >= 0
+                            ? "rgb(34, 197, 94)"
+                            : "rgb(239, 68, 68)"
+                        }
+                        stopOpacity={0.18}
+                      />
+                      <stop
+                        offset="100%"
+                        stopColor={
+                          totalNetWorthDailyPL >= 0
+                            ? "rgb(34, 197, 94)"
+                            : "rgb(239, 68, 68)"
+                        }
+                        stopOpacity={0}
+                      />
+                    </linearGradient>
+                  </defs>
+                  <YAxis domain={totalNetWorthDomain} hide />
                   <Area
                     type="monotone"
                     dataKey="value"
@@ -120,12 +174,10 @@ export default function SummaryCards({
                         ? "rgb(34, 197, 94)"
                         : "rgb(239, 68, 68)"
                     }
-                    fill={
-                      totalNetWorthDailyPL >= 0
-                        ? "rgba(34, 197, 94, 0.1)"
-                        : "rgba(239, 68, 68, 0.1)"
-                    }
+                    fill="url(#totalNetWorthSparkline)"
                     strokeWidth={2}
+                    dot={false}
+                    isAnimationActive={false}
                   />
                 </AreaChart>
               </ResponsiveContainer>
@@ -187,6 +239,35 @@ export default function SummaryCards({
             <div className="w-24 h-16 ml-4">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={miniChartData}>
+                  <defs>
+                    <linearGradient
+                      id="investmentsSparkline"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop
+                        offset="0%"
+                        stopColor={
+                          investmentsDailyPL >= 0
+                            ? "rgb(34, 197, 94)"
+                            : "rgb(239, 68, 68)"
+                        }
+                        stopOpacity={0.18}
+                      />
+                      <stop
+                        offset="100%"
+                        stopColor={
+                          investmentsDailyPL >= 0
+                            ? "rgb(34, 197, 94)"
+                            : "rgb(239, 68, 68)"
+                        }
+                        stopOpacity={0}
+                      />
+                    </linearGradient>
+                  </defs>
+                  <YAxis domain={investmentsDomain} hide />
                   <Area
                     type="monotone"
                     dataKey="value"
@@ -195,12 +276,10 @@ export default function SummaryCards({
                         ? "rgb(34, 197, 94)"
                         : "rgb(239, 68, 68)"
                     }
-                    fill={
-                      investmentsDailyPL >= 0
-                        ? "rgba(34, 197, 94, 0.1)"
-                        : "rgba(239, 68, 68, 0.1)"
-                    }
+                    fill="url(#investmentsSparkline)"
                     strokeWidth={2}
+                    dot={false}
+                    isAnimationActive={false}
                   />
                 </AreaChart>
               </ResponsiveContainer>
@@ -257,4 +336,3 @@ export default function SummaryCards({
     </div>
   );
 }
-

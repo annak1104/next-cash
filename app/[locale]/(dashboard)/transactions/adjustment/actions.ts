@@ -3,7 +3,7 @@
 import { db } from "@/db";
 import { categoriesTable, transactionsTable } from "@/db/schema";
 import { auth } from "@clerk/nextjs/server";
-import { and, eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import getWalletBalance from "@/data/getWalletBalance";
 
 export const createAdjustmentTransaction = async (data: {
@@ -72,4 +72,3 @@ export const createAdjustmentTransaction = async (data: {
     adjustmentAmount,
   };
 };
-

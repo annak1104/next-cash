@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { format } from "date-fns";
 
 import { tradeColumns } from "./columns";
 import { DataTable } from "../data-table";
@@ -110,5 +109,4 @@ export default function TradesTable({ portfolios, initialTrades }: Props) {
     </div>
   );
 }
-
 
