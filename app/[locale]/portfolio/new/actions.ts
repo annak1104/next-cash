@@ -9,6 +9,7 @@ import {
   transactionsTable,
   walletsTable,
 } from "@/db/schema";
+import { getUsdExchangeRates } from "@/lib/exchange-rates-server";
 import { tradeSchema } from "@/validation/tradeSchema";
 import { auth } from "@clerk/nextjs/server";
 import { and, eq } from "drizzle-orm";
@@ -198,7 +199,26 @@ export async function createAssetTrade(rawData: z.input<typeof tradeSchema>) {
       };
     }
 
-    const cashChangeBase = tradeValue * data.exchangeRate;
+    let exchangeRate = data.exchangeRate;
+    const walletCurrency = wallet.currency.toUpperCase();
+
+    if (walletCurrency !== "USD" && exchangeRate === 1) {
+      const rates = await getUsdExchangeRates().catch((error) => {
+        console.error("Failed to load exchange rate for asset trade:", error);
+        return null;
+      });
+      const derivedRate = rates?.[walletCurrency as keyof typeof rates];
+
+      if (
+        typeof derivedRate === "number" &&
+        Number.isFinite(derivedRate) &&
+        derivedRate > 0
+      ) {
+        exchangeRate = derivedRate;
+      }
+    }
+
+    const cashChangeBase = tradeValue * exchangeRate;
     const isBuy = data.type === "buy";
     const amount = cashChangeBase;
 
@@ -269,4 +289,3 @@ export async function createAssetTrade(rawData: z.input<typeof tradeSchema>) {
     error: false,
   };
 }
-

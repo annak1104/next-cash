@@ -40,6 +40,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { useCurrency } from "@/contexts/currency-context";
 import { cn } from "@/lib/utils";
 import { tradeSchema } from "@/validation/tradeSchema";
 import { toast } from "sonner";
@@ -73,6 +74,7 @@ type FormValues = z.infer<typeof tradeSchema>;
 
 export default function NewTradeForm({ portfolios, wallets }: Props) {
   const router = useRouter();
+  const { rates, isLoadingRates } = useCurrency();
   const [cryptoOptions, setCryptoOptions] = useState<CryptoOption[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -81,6 +83,7 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
   );
   const [isTickerPopoverOpen, setIsTickerPopoverOpen] = useState(false);
   const [apiPrice, setApiPrice] = useState<number | null>(null);
+  const [isExchangeRateManual, setIsExchangeRateManual] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(tradeSchema) as Resolver<FormValues>,
@@ -111,6 +114,23 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
   const watchType = form.watch("type");
   const watchEntryType = form.watch("entryType");
   const watchAssetType = form.watch("assetType");
+  const watchWalletId = form.watch("walletId");
+
+  const selectedWallet = useMemo(
+    () => wallets.find((wallet) => wallet.id === watchWalletId),
+    [wallets, watchWalletId],
+  );
+  const walletCurrency = selectedWallet?.currency?.toUpperCase() ?? "USD";
+  const derivedExchangeRate = useMemo(() => {
+    if (walletCurrency === "USD") {
+      return 1;
+    }
+
+    const rate = rates[walletCurrency as keyof typeof rates];
+    return typeof rate === "number" && Number.isFinite(rate) && rate > 0
+      ? rate
+      : null;
+  }, [rates, walletCurrency]);
 
   const totalAmount = useMemo(
     () => watchAmount * watchPrice + (watchFee || 0),
@@ -128,6 +148,21 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
       form.setValue("updateCash", false);
     }
   }, [watchEntryType, watchUpdateCash, form]);
+
+  useEffect(() => {
+    if (
+      !watchUpdateCash ||
+      isExchangeRateManual ||
+      derivedExchangeRate == null
+    ) {
+      return;
+    }
+
+    form.setValue("exchangeRate", derivedExchangeRate, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+  }, [derivedExchangeRate, form, isExchangeRateManual, watchUpdateCash]);
 
   // When switching to stocks, clear crypto-specific fields
   useEffect(() => {
@@ -277,7 +312,7 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
           {/* Main grid */}
           <div className="bg-background space-y-4 rounded-2xl border p-4 sm:p-6">
             {/* Asset type */}
-           
+
             {/* Type */}
             <FormField
               control={form.control}
@@ -402,7 +437,8 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
                                   />
                                 )}
                                 <span>
-                                  {selectedCrypto.symbol} — {selectedCrypto.name}
+                                  {selectedCrypto.symbol} —{" "}
+                                  {selectedCrypto.name}
                                 </span>
                               </div>
                             ) : field.value ? (
@@ -594,7 +630,12 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
                       watchEntryType === "multiple" ||
                       watchType === "revaluation"
                     }
-                    onCheckedChange={(checked) => field.onChange(checked)}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        setIsExchangeRateManual(false);
+                      }
+                      field.onChange(checked);
+                    }}
                   />
                 )}
               />
@@ -613,7 +654,10 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
                         <FormLabel>Cash account</FormLabel>
                         <FormControl>
                           <Select
-                            onValueChange={(val) => field.onChange(Number(val))}
+                            onValueChange={(val) => {
+                              setIsExchangeRateManual(false);
+                              field.onChange(Number(val));
+                            }}
                             value={field.value ? String(field.value) : ""}
                           >
                             <SelectTrigger>
@@ -645,9 +689,10 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
                             type="number"
                             step="any"
                             {...field}
-                            onChange={(e) =>
-                              field.onChange(parseFloat(e.target.value) || 1)
-                            }
+                            onChange={(e) => {
+                              setIsExchangeRateManual(true);
+                              field.onChange(parseFloat(e.target.value) || 1);
+                            }}
                           />
                         </FormControl>
                         <FormMessage />
@@ -659,10 +704,15 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
 
             {watchUpdateCash && (
               <p className="text-muted-foreground text-xs">
-                Currency rate:{" "}
+                Currency rate USD → {walletCurrency}:{" "}
                 <span className="underline">
-                  {watchExchangeRate ? watchExchangeRate.toFixed(3) : "—"}
+                  {isLoadingRates && derivedExchangeRate == null
+                    ? "loading…"
+                    : watchExchangeRate
+                      ? watchExchangeRate.toFixed(3)
+                      : "—"}
                 </span>
+                {isExchangeRateManual ? " (manual)" : ""}
               </p>
             )}
           </div>
@@ -682,6 +732,7 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
                   <span className="font-semibold">
                     {watchType === "buy" ? "-" : "+"}
                     {Number.isFinite(cashChange) ? cashChange.toFixed(2) : "0"}
+                    {watchUpdateCash ? ` ${walletCurrency}` : ""}
                   </span>
                 </div>
               )}
