@@ -29,7 +29,10 @@ export async function getRecentTransactions() {
     })
     .from(transactionsTable)
     .where(eq(transactionsTable.userId, userId))
-    .orderBy(desc(transactionsTable.transactionDate))
+    .orderBy(
+      desc(transactionsTable.transactionDate),
+      desc(transactionsTable.id),
+    )
     .leftJoin(
       categoriesTable,
       eq(transactionsTable.categoryId, categoriesTable.id),

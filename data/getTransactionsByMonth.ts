@@ -1,9 +1,5 @@
 import { db } from "@/db";
-import {
-  categoriesTable,
-  transactionsTable,
-  walletsTable,
-} from "@/db/schema";
+import { categoriesTable, transactionsTable, walletsTable } from "@/db/schema";
 import { getEffectiveTransactionType } from "@/lib/transaction-utils";
 import { auth } from "@clerk/nextjs/server";
 import { format } from "date-fns";
@@ -56,15 +52,15 @@ export async function getTransactionsByMonth({
         ),
       ),
     )
-    .orderBy(desc(transactionsTable.transactionDate))
+    .orderBy(
+      desc(transactionsTable.transactionDate),
+      desc(transactionsTable.id),
+    )
     .leftJoin(
       categoriesTable,
       eq(transactionsTable.categoryId, categoriesTable.id),
     )
-    .leftJoin(
-      walletsTable,
-      eq(transactionsTable.walletId, walletsTable.id),
-    );
+    .leftJoin(walletsTable, eq(transactionsTable.walletId, walletsTable.id));
 
   // Get unique wallet IDs for from/to wallets
   const walletIds = new Set<number>();
@@ -130,7 +126,9 @@ export async function getTransactionsByMonth({
         ? (feeByTransferId.get(tx.transferId) ?? null)
         : tx.fee,
     transactionType: getEffectiveTransactionType(tx),
-    fromWalletName: tx.fromWalletId ? walletMap.get(tx.fromWalletId) || null : null,
+    fromWalletName: tx.fromWalletId
+      ? walletMap.get(tx.fromWalletId) || null
+      : null,
     toWalletName: tx.toWalletId ? walletMap.get(tx.toWalletId) || null : null,
   }));
 }
