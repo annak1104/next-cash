@@ -1,8 +1,8 @@
 "use client";
 
 import { UserButton } from "@clerk/nextjs";
+import { useTheme } from "@wrksz/themes/client";
 import { ChartColumnBigIcon, Moon, Sun } from "lucide-react";
-import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 
 export default function UserDropdown() {

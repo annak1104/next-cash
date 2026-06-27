@@ -20,19 +20,25 @@ import {
 import { SUPPORTED_CURRENCY_OPTIONS } from "@/lib/supportedCurrencies";
 import { walletSchema } from "@/validation/walletSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { Resolver, useForm } from "react-hook-form";
 import { z } from "zod";
 
 const walletFormSchema = walletSchema;
+type WalletFormInput = z.input<typeof walletFormSchema>;
+type WalletFormOutput = z.output<typeof walletFormSchema>;
 
 type Props = {
-  onSubmit: (data: z.infer<typeof walletFormSchema>) => Promise<void>;
+  onSubmit: (data: WalletFormOutput) => Promise<void>;
   onCancel?: () => void;
 };
 
 export default function CreateWalletForm({ onSubmit, onCancel }: Props) {
-  const form = useForm<z.infer<typeof walletFormSchema>>({
-    resolver: zodResolver(walletFormSchema),
+  const form = useForm<WalletFormInput, unknown, WalletFormOutput>({
+    resolver: zodResolver(walletFormSchema) as Resolver<
+      WalletFormInput,
+      unknown,
+      WalletFormOutput
+    >,
     defaultValues: {
       name: "",
       currency: "",

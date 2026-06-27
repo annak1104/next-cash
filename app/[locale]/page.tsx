@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
-import { SignedIn, SignedOut, SignInButton, SignUpButton } from "@clerk/nextjs";
+import { Show, SignInButton, SignUpButton } from "@clerk/nextjs";
 import { ChartColumnBigIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
@@ -23,12 +23,12 @@ export default function Home({
           <ChartColumnBigIcon className="text-lime-500" size={60} /> NextCash
         </h1>
         <p className="text-2xl">{t("header")}</p>
-        <SignedIn>
+        <Show when="signed-in">
           <Button asChild size="lg">
             <Link href="/portfolio">{t("btn")}</Link>
           </Button>
-        </SignedIn>
-        <SignedOut>
+        </Show>
+        <Show when="signed-out">
           <div className="flex items-center justify-center gap-2">
             <Button asChild size="lg" className="bg-lime-600 hover:bg-lime-500">
               <SignInButton />
@@ -37,7 +37,7 @@ export default function Home({
               <SignUpButton />
             </Button>
           </div>
-        </SignedOut>
+        </Show>
       </div>
     </main>
   );

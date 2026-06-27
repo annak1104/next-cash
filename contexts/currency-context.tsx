@@ -33,16 +33,16 @@ const STORAGE_KEY = "fintrack:selected-currency";
 
 export function CurrencyProvider({ children }: { children: React.ReactNode }) {
   const [selectedCurrency, setSelectedCurrencyState] =
-    useState<SupportedCurrencyCode>("USD");
+    useState<SupportedCurrencyCode>(() => {
+      if (typeof window === "undefined") {
+        return "USD";
+      }
+
+      const saved = localStorage.getItem(STORAGE_KEY);
+      return saved && isSupportedCurrency(saved) ? saved : "USD";
+    });
   const [rates, setRates] = useState<ExchangeRates>({ USD: 1 });
   const [isLoadingRates, setIsLoadingRates] = useState(true);
-
-  useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved && isSupportedCurrency(saved)) {
-      setSelectedCurrencyState(saved);
-    }
-  }, []);
 
   useEffect(() => {
     let isMounted = true;

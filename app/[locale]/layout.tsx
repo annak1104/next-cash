@@ -1,5 +1,5 @@
-import { LanguageDropdown } from "@/components/lang-dropdown";
 import CurrencySelector from "@/components/currency-selector";
+import { LanguageDropdown } from "@/components/lang-dropdown";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Button } from "@/components/ui/button";
 import { CurrencyProvider } from "@/contexts/currency-context";
@@ -8,13 +8,7 @@ import NavbarMenu from "@/components/navbar-menu";
 import UserDropdown from "@/components/user-dropdown";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
-import {
-  ClerkProvider,
-  SignedIn,
-  SignedOut,
-  SignInButton,
-  SignUpButton,
-} from "@clerk/nextjs";
+import { ClerkProvider, Show, SignInButton, SignUpButton } from "@clerk/nextjs";
 import { ChartColumnBigIcon } from "lucide-react";
 import type { Metadata } from "next";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
@@ -62,43 +56,44 @@ export default async function RootLayout({
             defaultTheme="system"
             enableSystem
             disableTransitionOnChange
+            storage="hybrid"
           >
             <NextIntlClientProvider locale={locale} messages={messages}>
               <CurrencyProvider>
-              <nav className="bg-background flex h-16 items-center justify-between border-b p-4 text-white">
-                <div className="flex gap-10">
-                  <Link
-                    href="/"
-                    className="text-primary flex items-center gap-1 text-2xl font-bold"
-                  >
-                    <ChartColumnBigIcon className="text-lime-500" />
-                    NextCash
-                  </Link>
-                  <SignedIn>
-                    <NavbarMenu />
-                  </SignedIn>
-                </div>
-                <div className="flex gap-1">
-                  <CurrencySelector />
-                  <LanguageDropdown />
-                  <SignedOut>
-                    <div className="flex items-center">
-                      <Button asChild variant="link" className="text-primary">
-                        <SignInButton />
-                      </Button>
-                      <Button asChild variant="link" className="text-primary">
-                        <SignUpButton />
-                      </Button>
-                    </div>
-                  </SignedOut>
-                  <SignedIn>
-                    <UserDropdown />
-                  </SignedIn>
-                </div>
-              </nav>
+                <nav className="bg-background flex h-16 items-center justify-between border-b p-4 text-white">
+                  <div className="flex gap-10">
+                    <Link
+                      href="/"
+                      className="text-primary flex items-center gap-1 text-2xl font-bold"
+                    >
+                      <ChartColumnBigIcon className="text-lime-500" />
+                      NextCash
+                    </Link>
+                    <Show when="signed-in">
+                      <NavbarMenu />
+                    </Show>
+                  </div>
+                  <div className="flex gap-1">
+                    <CurrencySelector />
+                    <LanguageDropdown />
+                    <Show when="signed-out">
+                      <div className="flex items-center">
+                        <Button asChild variant="link" className="text-primary">
+                          <SignInButton />
+                        </Button>
+                        <Button asChild variant="link" className="text-primary">
+                          <SignUpButton />
+                        </Button>
+                      </div>
+                    </Show>
+                    <Show when="signed-in">
+                      <UserDropdown />
+                    </Show>
+                  </div>
+                </nav>
 
-              {children}
-              <Toaster />
+                {children}
+                <Toaster />
               </CurrencyProvider>
             </NextIntlClientProvider>
           </ThemeProvider>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 
 import HoldingsTable from "./holdings-table";
 import PortfolioCards from "./portfolio-cards";
@@ -80,14 +80,11 @@ export default function PortfolioHoldingsSection({
   const [allStats, setAllStats] = useState<PortfolioStats>(
     calculateStats(initialHoldings),
   );
-  // Stats for currently selected portfolio (used by summary section)
-  const [stats, setStats] = useState<PortfolioStats>(calculateStats(initialHoldings));
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    setStats(calculateStats(holdings));
-  }, [holdings]);
+  // Stats for currently selected portfolio (used by summary section)
+  const stats = useMemo(() => calculateStats(holdings), [holdings]);
 
   const handleSelectPortfolio = async (portfolioId: string | "all") => {
     setSelectedPortfolioId(portfolioId);
@@ -96,7 +93,9 @@ export default function PortfolioHoldingsSection({
 
     try {
       const params =
-        portfolioId === "all" ? "" : `?portfolioId=${encodeURIComponent(portfolioId)}`;
+        portfolioId === "all"
+          ? ""
+          : `?portfolioId=${encodeURIComponent(portfolioId)}`;
       const response = await fetch(`/api/portfolio/holdings${params}`, {
         cache: "no-store",
       });
@@ -128,7 +127,9 @@ export default function PortfolioHoldingsSection({
     } catch (err) {
       console.error("Error loading holdings:", err);
       const errorMessage =
-        err instanceof Error ? err.message : "Failed to load holdings. Please try again.";
+        err instanceof Error
+          ? err.message
+          : "Failed to load holdings. Please try again.";
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -162,5 +163,3 @@ export default function PortfolioHoldingsSection({
     </div>
   );
 }
-
-
