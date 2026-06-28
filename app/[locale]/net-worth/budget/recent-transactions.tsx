@@ -1,7 +1,10 @@
-import { Badge } from "@/components/ui/badge";
+import CurrencyAmount from "@/components/currency-amount";
+import {
+  TransactionCategoryLabel,
+  TransactionTypeBadge,
+} from "@/components/transaction-row-visuals";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import CurrencyAmount from "@/components/currency-amount";
 import {
   Table,
   TableBody,
@@ -40,7 +43,7 @@ export default async function RecentTransactions() {
         {!!transactions?.length && (
           <Table className="mt-4">
             <TableHeader>
-              <TableRow>
+              <TableRow className="border-dashed">
                 <TableHead>Date</TableHead>
                 <TableHead>Description</TableHead>
                 <TableHead>Type</TableHead>
@@ -50,27 +53,26 @@ export default async function RecentTransactions() {
             </TableHeader>
             <TableBody>
               {transactions.map((transaction) => (
-                <TableRow key={transaction.id}>
-                  <TableCell>
+                <TableRow
+                  key={transaction.id}
+                  className="hover:bg-muted/30 border-dashed"
+                >
+                  <TableCell className="py-4">
                     {format(transaction.transactionDate, "do MMM yyyy")}
                   </TableCell>
-                  <TableCell>{transaction.description}</TableCell>
-                  <TableCell className="capitalize">
-                    <Badge
-                      className={
-                        transaction.transactionType === "income"
-                          ? "bg-lime-500"
-                          : transaction.transactionType === "transfer" ||
-                              transaction.transactionType === "adjustment"
-                            ? "bg-sky-500"
-                            : "bg-orange-500"
-                      }
-                    >
-                      {transaction.transactionType}
-                    </Badge>
+                  <TableCell className="text-muted-foreground py-4">
+                    {transaction.description || "--"}
                   </TableCell>
-                  <TableCell>{transaction.category}</TableCell>
-                  <TableCell>
+                  <TableCell className="py-4">
+                    <TransactionTypeBadge type={transaction.transactionType} />
+                  </TableCell>
+                  <TableCell className="py-4">
+                    <TransactionCategoryLabel
+                      category={transaction.category}
+                      type={transaction.transactionType}
+                    />
+                  </TableCell>
+                  <TableCell className="py-4 text-base font-medium">
                     <CurrencyAmount
                       amount={Number(transaction.amount)}
                       fromCurrency={transaction.walletCurrency || "USD"}

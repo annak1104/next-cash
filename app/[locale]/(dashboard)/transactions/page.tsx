@@ -1,5 +1,8 @@
 import CurrencyAmount from "@/components/currency-amount";
-import { Badge } from "@/components/ui/badge";
+import {
+  TransactionCategoryLabel,
+  TransactionTypeBadge,
+} from "@/components/transaction-row-visuals";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -85,7 +88,7 @@ export default async function TransactionsPage({
           {!!transactions?.length && (
             <Table className="mt-4">
               <TableHeader>
-                <TableRow>
+                <TableRow className="border-dashed">
                   <TableHead>Type</TableHead>
                   <TableHead className="cursor-pointer">Date</TableHead>
                   <TableHead>Category</TableHead>
@@ -100,37 +103,34 @@ export default async function TransactionsPage({
                 {transactions.map((transaction) => {
                   const transactionType = transaction.transactionType;
                   const isTransfer = transactionType === "transfer";
-                  const isAdjustment = transactionType === "adjustment";
-                  const isIncome = transactionType === "income";
-
-                  // Badge color logic
-                  let badgeColor = "bg-orange-500"; // default expense
-                  if (isIncome) {
-                    badgeColor = "bg-lime-500";
-                  } else if (isTransfer || isAdjustment) {
-                    badgeColor = "bg-sky-500";
-                  }
-
                   const currency = transaction.walletCurrency || "USD";
                   const amount = Number(transaction.amount);
                   const fee = transaction.fee ? Number(transaction.fee) : null;
 
                   return (
-                    <TableRow key={transaction.id}>
-                      <TableCell>
-                        <Badge className={badgeColor}>{transactionType}</Badge>
+                    <TableRow
+                      key={transaction.id}
+                      className="hover:bg-muted/30 border-dashed"
+                    >
+                      <TableCell className="py-4">
+                        <TransactionTypeBadge type={transactionType} />
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="py-4 text-base">
                         {format(
                           new Date(transaction.transactionDate),
                           "dd-MM-yyyy",
                         )}
                       </TableCell>
-                      <TableCell>{transaction.category || "--"}</TableCell>
-                      <TableCell className="text-muted-foreground">
+                      <TableCell className="py-4">
+                        <TransactionCategoryLabel
+                          category={transaction.category}
+                          type={transactionType}
+                        />
+                      </TableCell>
+                      <TableCell className="text-muted-foreground py-4">
                         {transaction.description || "--"}
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="py-4">
                         {isTransfer ? (
                           <div className="flex flex-col gap-1 text-sm">
                             {transaction.fromWalletName && (
@@ -154,13 +154,13 @@ export default async function TransactionsPage({
                           <span className="text-muted-foreground">--</span>
                         )}
                       </TableCell>
-                      <TableCell className="font-medium">
+                      <TableCell className="py-4 text-base font-medium">
                         <CurrencyAmount
                           amount={amount}
                           fromCurrency={currency}
                         />
                       </TableCell>
-                      <TableCell className="text-muted-foreground">
+                      <TableCell className="text-muted-foreground py-4">
                         {fee !== null ? (
                           <CurrencyAmount
                             amount={fee}
@@ -170,18 +170,20 @@ export default async function TransactionsPage({
                           "--"
                         )}
                       </TableCell>
-                      <TableCell>
-                        <Button
-                          variant="ghost"
-                          asChild
-                          size="icon"
-                          aria-label="edit transaction"
-                          className="h-8 w-8"
-                        >
-                          <Link href={`transactions/${transaction.id}`}>
-                            <Edit2Icon className="h-4 w-4" />
-                          </Link>
-                        </Button>
+                      <TableCell className="py-4">
+                        <div className="flex items-center justify-end gap-2">
+                          <Button
+                            variant="ghost"
+                            asChild
+                            size="icon"
+                            aria-label="edit transaction"
+                            className="text-muted-foreground hover:text-foreground h-8 w-8"
+                          >
+                            <Link href={`transactions/${transaction.id}`}>
+                              <Edit2Icon className="h-5 w-5" />
+                            </Link>
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   );
