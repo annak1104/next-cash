@@ -9,15 +9,15 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import getWallets from "@/data/getWallets";
 import Link from "next/link";
-import TransferTransactionForm from "./transfer-transaction-form";
 import { getCashTransferCategoryId } from "./actions";
+import TransferTransactionForm from "./transfer-transaction-form";
 
 export default async function TransferTransactionPage() {
   const cashTransferCategoryId = await getCashTransferCategoryId();
   const wallets = await getWallets();
 
   return (
-    <div className="mx-auto max-w-7xl px-1 py-10">
+    <div className="mx-auto max-w-7xl px-4 py-10">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -42,4 +42,3 @@ export default async function TransferTransactionPage() {
     </div>
   );
 }
-

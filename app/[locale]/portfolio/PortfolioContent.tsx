@@ -13,7 +13,7 @@ export default async function PortfolioContent() {
   const history = await getPortfolioHistory(undefined, 365);
 
   return (
-    <div className="mx-auto max-w-7xl px-1 py-10">
+    <div className="mx-auto max-w-7xl px-4 py-10">
       {/* Charts Section */}
       <div className="mb-6">
         <PortfolioValueChart

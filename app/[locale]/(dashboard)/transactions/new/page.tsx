@@ -14,7 +14,7 @@ import NewTransactionForm from "./new-transaction-form";
 export default async function NewTransactionPage() {
   const categories = await getCategories();
   return (
-    <div className="mx-auto max-w-7xl px-1 py-10">
+    <div className="mx-auto max-w-7xl px-4 py-10">
       <Breadcrumb>
         <BreadcrumbList>
           {/* <BreadcrumbItem>

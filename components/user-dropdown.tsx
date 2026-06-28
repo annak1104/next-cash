@@ -15,7 +15,6 @@ export default function UserDropdown() {
 
   return (
     <UserButton
-      showName
       appearance={{
         elements: {
           userButtonOuterIdentifier: {

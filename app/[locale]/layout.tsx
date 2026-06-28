@@ -73,7 +73,7 @@ export default async function RootLayout({
                       <NavbarMenu />
                     </Show>
                   </div>
-                  <div className="flex gap-1">
+                  <div className="flex gap-4">
                     <CurrencySelector />
                     <LanguageDropdown />
                     <Show when="signed-out">

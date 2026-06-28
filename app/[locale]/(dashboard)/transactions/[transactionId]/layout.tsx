@@ -10,7 +10,7 @@ import Link from "next/link";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mx-auto max-w-7xl px-1 py-10">
+    <div className="mx-auto max-w-7xl px-4 py-10">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>

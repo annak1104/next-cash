@@ -15,8 +15,7 @@ export default async function BudgetPage({
     cfYear = today.getFullYear();
   }
   return (
-    <div className="mx-auto max-w-7xl px-1 py-5">
-      
+    <div className="mx-auto max-w-7xl px-4 py-5">
       <WalletsSection />
       <Cashflow year={cfYear} />
       <RecentTransactions />

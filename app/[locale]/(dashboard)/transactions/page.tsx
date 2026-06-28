@@ -1,3 +1,4 @@
+import CurrencyAmount from "@/components/currency-amount";
 import { Badge } from "@/components/ui/badge";
 import {
   Breadcrumb,
@@ -8,7 +9,6 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
-import CurrencyAmount from "@/components/currency-amount";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -53,7 +53,7 @@ export default async function TransactionsPage({
   const yearsRange = await getTransactionYearsRange();
 
   return (
-    <div className="mx-auto max-w-7xl px-1 py-10">
+    <div className="mx-auto max-w-7xl px-4 py-10">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -77,9 +77,6 @@ export default async function TransactionsPage({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {/* <Button asChild>
-            <Link href="/transactions/new">New transaction</Link>
-          </Button> */}
           {!transactions?.length && (
             <p className="text-muted-foreground py-10 text-center text-lg">
               There are no transactions this month
@@ -121,9 +118,7 @@ export default async function TransactionsPage({
                   return (
                     <TableRow key={transaction.id}>
                       <TableCell>
-                        <Badge className={badgeColor}>
-                          {transactionType}
-                        </Badge>
+                        <Badge className={badgeColor}>{transactionType}</Badge>
                       </TableCell>
                       <TableCell>
                         {format(
@@ -160,11 +155,17 @@ export default async function TransactionsPage({
                         )}
                       </TableCell>
                       <TableCell className="font-medium">
-                        <CurrencyAmount amount={amount} fromCurrency={currency} />
+                        <CurrencyAmount
+                          amount={amount}
+                          fromCurrency={currency}
+                        />
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {fee !== null ? (
-                          <CurrencyAmount amount={fee} fromCurrency={currency} />
+                          <CurrencyAmount
+                            amount={fee}
+                            fromCurrency={currency}
+                          />
                         ) : (
                           "--"
                         )}

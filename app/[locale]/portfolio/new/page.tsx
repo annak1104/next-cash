@@ -18,7 +18,7 @@ export default async function AddNewCurrencyPage() {
   const wallets = await getWallets();
 
   return (
-    <div className="mx-auto max-w-7xl px-1 py-10">
+    <div className="mx-auto max-w-7xl px-4 py-10">
       <Breadcrumb>
         <BreadcrumbList>
           {/* <BreadcrumbItem>

@@ -37,7 +37,7 @@ export function LanguageDropdown() {
           <span className="text-3xl">{localeFlags[locale] || "🏳️"}</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56">
+      <DropdownMenuContent className="w-24">
         <DropdownMenuSeparator />
         <DropdownMenuRadioGroup value={locale} onValueChange={switchLocale}>
           <DropdownMenuRadioItem value="en">
