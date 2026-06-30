@@ -29,7 +29,7 @@ export default function WalletsList({ wallets }: WalletsListProps) {
               return (
                 <div
                   key={wallet.id}
-                  className="glass-surface hover:bg-glass-background-hover flex items-center justify-between rounded-[1.4rem] p-4 transition-all duration-300"
+                  className="glass-surface hover:bg-glass flex items-center justify-between rounded-[1.4rem] p-4 transition-all duration-300"
                 >
                   <div className="flex items-center gap-3">
                     <div className="glass-control flex h-10 w-10 items-center justify-center rounded-full text-xl">

@@ -23,7 +23,7 @@ export const columns: ColumnDef<HoldingRow>[] = [
               className="rounded-full"
             />
           ) : (
-            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-muted">
+            <div className="glass-control flex h-7 w-7 items-center justify-center rounded-full">
               <span className="text-xs font-medium">
                 {symbol.substring(0, 2)}
               </span>
@@ -31,7 +31,7 @@ export const columns: ColumnDef<HoldingRow>[] = [
           )}
           <div className="flex flex-col">
             <span className="font-medium">{symbol}</span>
-            <span className="text-xs text-muted-foreground">{name}</span>
+            <span className="text-muted-foreground text-xs">{name}</span>
           </div>
         </div>
       );
@@ -117,8 +117,7 @@ export const columns: ColumnDef<HoldingRow>[] = [
     cell: ({ row }) => {
       const invested = Number(row.original.invested);
       const unrealizedPL = Number(row.original.unrealizedPL);
-      const percent =
-        invested > 0 ? (unrealizedPL / invested) * 100 : 0;
+      const percent = invested > 0 ? (unrealizedPL / invested) * 100 : 0;
       return (
         <span className={percent >= 0 ? "text-green-500" : "text-red-500"}>
           {percent >= 0 ? "+" : ""}

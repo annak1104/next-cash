@@ -55,7 +55,7 @@ export default async function RecentTransactions() {
               {transactions.map((transaction) => (
                 <TableRow
                   key={transaction.id}
-                  className="hover:bg-muted/30 border-dashed"
+                  className="hover:bg-glass border-dashed"
                 >
                   <TableCell className="py-4">
                     {format(transaction.transactionDate, "do MMM yyyy")}

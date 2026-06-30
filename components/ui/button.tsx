@@ -10,15 +10,15 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "border border-white/35 bg-[linear-gradient(135deg,color-mix(in_oklch,var(--primary)_92%,white),color-mix(in_oklch,var(--primary)_82%,black))] text-primary-foreground shadow-[0_12px_30px_color-mix(in_srgb,var(--primary)_28%,transparent),inset_0_1px_0_rgba(255,255,255,0.38)] hover:shadow-[0_16px_38px_color-mix(in_srgb,var(--primary)_34%,transparent),inset_0_1px_0_rgba(255,255,255,0.48)]",
+          "border border-white/35 bg-[linear-gradient(135deg,color-mix(in_oklch,var(--primary)_94%,white),color-mix(in_oklch,var(--primary)_82%,black))] text-primary-foreground shadow-[0_12px_30px_color-mix(in_srgb,var(--primary)_30%,transparent),inset_0_1px_0_rgba(255,255,255,0.42)] hover:shadow-[0_16px_38px_color-mix(in_srgb,var(--primary)_36%,transparent),inset_0_1px_0_rgba(255,255,255,0.5)]",
         destructive:
-          "border border-red-300/30 bg-destructive/90 text-white shadow-[0_12px_30px_rgba(239,68,68,0.22),inset_0_1px_0_rgba(255,255,255,0.22)] hover:bg-destructive focus-visible:ring-destructive/25 dark:bg-destructive/70 dark:focus-visible:ring-destructive/40",
+          "border border-red-300/30 bg-destructive/90 text-white shadow-[0_12px_30px_rgba(239,68,68,0.24),inset_0_1px_0_rgba(255,255,255,0.22)] hover:bg-destructive focus-visible:ring-destructive/25 dark:bg-destructive/70 dark:focus-visible:ring-destructive/40",
         outline:
           "glass-control text-foreground hover:text-accent-foreground focus-visible:border-ring",
         secondary:
           "glass-control text-secondary-foreground hover:text-foreground",
         ghost:
-          "text-foreground/80 shadow-none hover:bg-glass-background-hover hover:text-foreground hover:shadow-[inset_0_1px_0_var(--glass-highlight),0_8px_22px_rgba(31,41,55,0.08)] dark:hover:bg-white/10",
+          "text-foreground/80 shadow-none hover:bg-glass-strong hover:text-foreground hover:shadow-[inset_0_1px_0_var(--glass-highlight),0_8px_22px_rgba(31,41,55,0.08)] dark:hover:bg-white/10",
         link: "rounded-md px-1 text-primary shadow-none hover:scale-100 hover:text-accent-color hover:underline hover:underline-offset-4",
       },
       size: {

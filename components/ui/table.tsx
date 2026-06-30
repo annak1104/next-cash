@@ -24,7 +24,7 @@ function TableHeader({ className, ...props }: React.ComponentProps<"thead">) {
     <thead
       data-slot="table-header"
       className={cn(
-        "bg-glass-background/80 sticky top-0 z-10 backdrop-blur-2xl [&_tr]:border-b [&_tr]:border-white/20",
+        "bg-glass-strong/95 [&_tr]:border-glass-border sticky top-0 z-10 backdrop-blur-2xl [&_tr]:border-b",
         className,
       )}
       {...props}
@@ -47,7 +47,7 @@ function TableFooter({ className, ...props }: React.ComponentProps<"tfoot">) {
     <tfoot
       data-slot="table-footer"
       className={cn(
-        "bg-glass-background-hover/60 border-t border-white/20 font-medium backdrop-blur-xl [&>tr]:last:border-b-0",
+        "border-glass-border bg-glass/90 border-t font-medium backdrop-blur-xl [&>tr]:last:border-b-0",
         className,
       )}
       {...props}
@@ -60,7 +60,7 @@ function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
     <tr
       data-slot="table-row"
       className={cn(
-        "hover:bg-glass-background-hover/70 data-[state=selected]:bg-accent/40 border-b border-white/15 transition-[background,box-shadow,transform] duration-200 ease-out hover:shadow-[inset_0_1px_0_var(--glass-highlight)]",
+        "border-glass-border/70 hover:bg-glass data-[state=selected]:bg-accent/50 border-b transition-[background,box-shadow,transform] duration-200 ease-out hover:shadow-[inset_0_1px_0_var(--glass-highlight)]",
         className,
       )}
       {...props}
@@ -73,7 +73,7 @@ function TableHead({ className, ...props }: React.ComponentProps<"th">) {
     <th
       data-slot="table-head"
       className={cn(
-        "text-muted-foreground h-12 px-4 text-left align-middle text-xs font-semibold tracking-[0.03em] whitespace-nowrap uppercase [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+        "text-muted-foreground h-12 px-4 text-left align-middle text-xs font-semibold tracking-[0.04em] whitespace-nowrap uppercase [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
         className,
       )}
       {...props}

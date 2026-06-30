@@ -11,7 +11,7 @@ import Link from "next/link";
 export default function NavbarMenu() {
   const t = useTranslations("navbar");
   return (
-    <Menubar className="hidden lg:flex">
+    <Menubar className="hidden border-none bg-transparent lg:flex">
       {/* Portfolios */}
       <MenubarMenu>
         <MenubarTrigger className="text-foreground/85 cursor-pointer">

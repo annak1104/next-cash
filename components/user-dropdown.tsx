@@ -27,7 +27,7 @@ export default function UserDropdown() {
             boxShadow: "var(--glass-shadow-soft)",
           },
           userButtonPopoverCard: {
-            background: "var(--glass-background-strong)",
+            background: "var(--glass-strong)",
             border: "1px solid var(--glass-border)",
             borderRadius: "1.5rem",
             boxShadow: "var(--glass-shadow)",

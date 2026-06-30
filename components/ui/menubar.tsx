@@ -56,7 +56,7 @@ function MenubarTrigger({
     <MenubarPrimitive.Trigger
       data-slot="menubar-trigger"
       className={cn(
-        "focus:bg-glass-background-hover focus:text-accent-foreground data-[state=open]:bg-glass-background-hover data-[state=open]:text-accent-foreground flex items-center rounded-full px-4 py-1.5 text-sm font-semibold outline-hidden select-none",
+        "focus:bg-glass focus:text-accent-foreground data-[state=open]:bg-glass data-[state=open]:text-accent-foreground flex items-center rounded-full px-4 py-1.5 text-sm font-semibold outline-hidden select-none",
         className,
       )}
       {...props}
@@ -103,7 +103,7 @@ function MenubarItem({
       data-inset={inset}
       data-variant={variant}
       className={cn(
-        "focus:bg-glass-background-hover focus:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:text-destructive! [&_svg:not([class*='text-'])]:text-muted-foreground dark:data-[variant=destructive]:focus:bg-destructive/20 relative flex cursor-default items-center gap-2 rounded-xl px-3 py-2 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "focus:bg-glass focus:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:text-destructive! [&_svg:not([class*='text-'])]:text-muted-foreground dark:data-[variant=destructive]:focus:bg-destructive/20 relative flex cursor-default items-center gap-2 rounded-xl px-3 py-2 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       {...props}
@@ -188,7 +188,7 @@ function MenubarSeparator({
   return (
     <MenubarPrimitive.Separator
       data-slot="menubar-separator"
-      className={cn("-mx-1 my-1 h-px bg-white/15", className)}
+      className={cn("bg-glass-border -mx-1 my-1 h-px", className)}
       {...props}
     />
   );
@@ -248,7 +248,7 @@ function MenubarSubContent({
     <MenubarPrimitive.SubContent
       data-slot="menubar-sub-content"
       className={cn(
-        "glass-menu text-popover-foreground data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 z-50 min-w-[8rem] origin-(--radix-menubar-content-transform-origin) overflow-hidden rounded-2xl p-1.5",
+        "bg-popover text-popover-foreground data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 z-50 min-w-[8rem] origin-(--radix-menubar-content-transform-origin) overflow-hidden rounded-md border p-1 shadow-lg",
         className,
       )}
       {...props}

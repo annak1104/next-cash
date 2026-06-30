@@ -110,7 +110,7 @@ export default async function TransactionsPage({
                   return (
                     <TableRow
                       key={transaction.id}
-                      className="hover:bg-muted/30 border-dashed"
+                      className="hover:bg-glass border-dashed"
                     >
                       <TableCell className="py-4">
                         <TransactionTypeBadge type={transactionType} />
