@@ -28,9 +28,9 @@ export default function WalletsList({ wallets }: { wallets: Wallet[] }) {
           {/* Карточка створення акаунту */}
           <button
             onClick={() => setDialogOpen(true)}
-            className="bg-muted/50 text-muted-foreground hover:text-foreground flex min-w-[180px] flex-col items-center justify-center rounded-lg border border-dashed p-4 transition-colors"
+            className="glass-surface text-muted-foreground hover:text-foreground hover:bg-glass-background-hover flex min-w-[190px] flex-col items-center justify-center rounded-[1.75rem] border-dashed p-5 transition-all duration-300 hover:-translate-y-1"
           >
-            <div className="bg-background flex h-12 w-12 items-center justify-center rounded-full border-2 border-dashed">
+            <div className="glass-control flex h-12 w-12 items-center justify-center rounded-full border-2 border-dashed">
               <Plus className="h-6 w-6" />
             </div>
             <span className="text-sm font-medium">Create new account</span>

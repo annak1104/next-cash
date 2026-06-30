@@ -20,6 +20,19 @@ export default function UserDropdown() {
           userButtonOuterIdentifier: {
             color: "var(--primary)",
           },
+          userButtonAvatarBox: {
+            width: "2.5rem",
+            height: "2.5rem",
+            border: "1px solid var(--glass-border)",
+            boxShadow: "var(--glass-shadow-soft)",
+          },
+          userButtonPopoverCard: {
+            background: "var(--glass-background-strong)",
+            border: "1px solid var(--glass-border)",
+            borderRadius: "1.5rem",
+            boxShadow: "var(--glass-shadow)",
+            backdropFilter: "blur(var(--glass-blur)) saturate(180%)",
+          },
         },
       }}
     >

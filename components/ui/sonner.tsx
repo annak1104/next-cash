@@ -29,9 +29,15 @@ const Toaster = ({ ...props }: ToasterProps) => {
           "--normal-bg": "var(--popover)",
           "--normal-text": "var(--popover-foreground)",
           "--normal-border": "var(--border)",
-          "--border-radius": "var(--radius)",
+          "--border-radius": "1.5rem",
+          "--normal-shadow": "var(--glass-shadow)",
         } as React.CSSProperties
       }
+      toastOptions={{
+        classNames: {
+          toast: "glass-menu border-glass-border rounded-3xl backdrop-blur-2xl",
+        },
+      }}
       {...props}
     />
   );

@@ -11,10 +11,10 @@ import Link from "next/link";
 export default function NavbarMenu() {
   const t = useTranslations("navbar");
   return (
-    <Menubar className="border-none bg-transparent">
+    <Menubar className="hidden lg:flex">
       {/* Portfolios */}
       <MenubarMenu>
-        <MenubarTrigger className="text-primary cursor-pointer">
+        <MenubarTrigger className="text-foreground/85 cursor-pointer">
           {t("portfolios")}
         </MenubarTrigger>
 
@@ -31,7 +31,7 @@ export default function NavbarMenu() {
 
       {/* Net Worth */}
       <MenubarMenu>
-        <MenubarTrigger className="text-primary cursor-pointer">
+        <MenubarTrigger className="text-foreground/85 cursor-pointer">
           {t("net-worth")}
         </MenubarTrigger>
 
