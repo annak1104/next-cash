@@ -59,9 +59,9 @@ export default function WalletCard({ wallet }: Props) {
 
   return (
     <>
-      <div className="bg-card relative flex min-w-[180px] flex-col items-center rounded-lg border p-4 shadow-sm">
+      <div className="glass-card relative flex min-w-[190px] flex-col items-center p-5 transition-transform duration-300 hover:-translate-y-1">
         {/* Flag icon */}
-        <div className="bg-muted mb-3 flex h-12 w-12 items-center justify-center rounded-full text-2xl">
+        <div className="glass-control mb-3 flex h-12 w-12 items-center justify-center rounded-full text-2xl">
           {flag}
         </div>
 
@@ -77,7 +77,7 @@ export default function WalletCard({ wallet }: Props) {
         <div className="absolute top-2 right-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-6 w-6">
+              <Button variant="ghost" size="icon-sm">
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>

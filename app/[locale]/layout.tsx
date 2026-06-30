@@ -60,39 +60,45 @@ export default async function RootLayout({
           >
             <NextIntlClientProvider locale={locale} messages={messages}>
               <CurrencyProvider>
-                <nav className="bg-background flex h-16 items-center justify-between border-b p-4 text-white">
-                  <div className="flex gap-10">
-                    <Link
-                      href="/"
-                      className="text-primary flex items-center gap-1 text-2xl font-bold"
-                    >
-                      <ChartColumnBigIcon className="text-lime-500" />
-                      NextCash
-                    </Link>
-                    <Show when="signed-in">
-                      <NavbarMenu />
-                    </Show>
-                  </div>
-                  <div className="flex gap-4">
-                    <CurrencySelector />
-                    <LanguageDropdown />
-                    <Show when="signed-out">
-                      <div className="flex items-center">
-                        <Button asChild variant="link" className="text-primary">
-                          <SignInButton />
-                        </Button>
-                        <Button asChild variant="link" className="text-primary">
-                          <SignUpButton />
-                        </Button>
-                      </div>
-                    </Show>
-                    <Show when="signed-in">
-                      <UserDropdown />
-                    </Show>
-                  </div>
-                </nav>
+                <div className="sticky top-0 z-40 px-3 pt-3 sm:px-5">
+                  <nav className="glass-nav text-foreground mx-auto flex min-h-16 max-w-7xl items-center justify-between gap-3 rounded-[2rem] px-4 py-3">
+                    <div className="flex min-w-0 items-center gap-4 lg:gap-10">
+                      <Link
+                        href="/"
+                        className="group text-foreground flex min-w-0 items-center gap-2 text-xl font-bold tracking-[-0.04em] sm:text-2xl"
+                      >
+                        <span className="glass-control text-primary flex size-10 items-center justify-center rounded-full shadow-sm transition-transform duration-300 group-hover:scale-105">
+                          <ChartColumnBigIcon className="text-primary size-5" />
+                        </span>
+                        <span className="truncate">NextCash</span>
+                      </Link>
+                      <Show when="signed-in">
+                        <NavbarMenu />
+                      </Show>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+                      <CurrencySelector />
+                      <LanguageDropdown />
+                      <Show when="signed-out">
+                        <div className="flex items-center gap-1">
+                          <Button asChild variant="ghost" size="sm">
+                            <SignInButton />
+                          </Button>
+                          <Button asChild size="sm">
+                            <SignUpButton />
+                          </Button>
+                        </div>
+                      </Show>
+                      <Show when="signed-in">
+                        <UserDropdown />
+                      </Show>
+                    </div>
+                  </nav>
+                </div>
 
-                {children}
+                <main className="liquid-page px-3 pb-10 sm:px-5">
+                  {children}
+                </main>
                 <Toaster />
               </CurrencyProvider>
             </NextIntlClientProvider>

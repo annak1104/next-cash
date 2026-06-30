@@ -1,12 +1,12 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useCurrency } from "@/contexts/currency-context";
 import { formatCurrency } from "@/lib/currency-utils";
 import { cn } from "@/lib/utils";
@@ -93,7 +93,10 @@ export default function PortfolioValueChart({
   const rangeStart = getRangeStart(selectedRange);
   const filteredData = data.filter((point) => {
     const pointDate = parseISO(point.date);
-    return isAfter(pointDate, rangeStart) || pointDate.toDateString() === rangeStart.toDateString();
+    return (
+      isAfter(pointDate, rangeStart) ||
+      pointDate.toDateString() === rangeStart.toDateString()
+    );
   });
   const visibleData =
     filteredData.length > 0
@@ -121,7 +124,9 @@ export default function PortfolioValueChart({
     formattedDate: format(parseISO(point.date), "MMM dd"),
     tooltipDate: format(parseISO(point.date), "MMM dd, yyyy"),
   }));
-  const valueDomain = getValueDomain(chartData.map((point) => point.displayValue));
+  const valueDomain = getValueDomain(
+    chartData.map((point) => point.displayValue),
+  );
 
   return (
     <Card>
@@ -129,10 +134,13 @@ export default function PortfolioValueChart({
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div className="min-w-0 space-y-1">
-              <CardTitle className="break-words text-3xl font-bold sm:text-4xl">
-                {formatCurrency(convertAmount(currentValue, currency), selectedCurrency)}
+              <CardTitle className="text-3xl font-bold break-words sm:text-4xl">
+                {formatCurrency(
+                  convertAmount(currentValue, currency),
+                  selectedCurrency,
+                )}
               </CardTitle>
-              <div className="flex flex-col gap-2 text-sm text-muted-foreground sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
+              <div className="text-muted-foreground flex flex-col gap-2 text-sm sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
                 <div className="flex items-center gap-1">
                   <span
                     className={cn(
@@ -144,8 +152,8 @@ export default function PortfolioValueChart({
                     {formatCurrency(
                       convertAmount(dailyPL, currency),
                       selectedCurrency,
-                    )} (
-                    {dailyPLPercent >= 0 ? "+" : ""}
+                    )}{" "}
+                    ({dailyPLPercent >= 0 ? "+" : ""}
                     {dailyPLPercent.toFixed(2)}%)
                   </span>
                   <span>Daily P&L</span>
@@ -161,15 +169,15 @@ export default function PortfolioValueChart({
                     {formatCurrency(
                       convertAmount(unrealizedPL, currency),
                       selectedCurrency,
-                    )} (
-                    {unrealizedPLPercent >= 0 ? "+" : ""}
+                    )}{" "}
+                    ({unrealizedPLPercent >= 0 ? "+" : ""}
                     {unrealizedPLPercent.toFixed(2)}%)
                   </span>
                   <span>Unrealized P&L</span>
                 </div>
               </div>
             </div>
-            <div className="flex w-full items-center gap-1 overflow-x-auto rounded-lg border p-1 sm:w-fit">
+            <div className="glass-control flex w-full items-center gap-1 overflow-x-auto rounded-full p-1 sm:w-fit">
               {TIME_RANGES.map((range) => (
                 <Button
                   key={range.label}
@@ -187,7 +195,7 @@ export default function PortfolioValueChart({
       </CardHeader>
       <CardContent>
         {chartData.length === 0 ? (
-          <div className="flex h-[300px] items-center justify-center rounded-md border border-dashed text-sm text-muted-foreground">
+          <div className="glass-surface text-muted-foreground flex h-[300px] items-center justify-center rounded-[1.5rem] border-dashed text-sm">
             No portfolio history yet
           </div>
         ) : (
@@ -209,7 +217,7 @@ export default function PortfolioValueChart({
                   <stop
                     offset="5%"
                     stopColor="rgb(99, 102, 241)"
-                    stopOpacity={0.3}
+                    stopOpacity={0.34}
                   />
                   <stop
                     offset="95%"
@@ -218,7 +226,11 @@ export default function PortfolioValueChart({
                   />
                 </linearGradient>
               </defs>
-              <CartesianGrid vertical={false} strokeDasharray="3 3" />
+              <CartesianGrid
+                vertical={false}
+                stroke="rgba(148, 163, 184, 0.18)"
+                strokeDasharray="3 5"
+              />
               <XAxis
                 dataKey="formattedDate"
                 tickLine={false}
@@ -260,9 +272,12 @@ export default function PortfolioValueChart({
               <Area
                 type="monotone"
                 dataKey="displayValue"
-                stroke="rgb(99, 102, 241)"
+                stroke="rgb(90, 92, 255)"
                 strokeWidth={2.5}
                 fill="url(#valueGradient)"
+                style={{
+                  filter: "drop-shadow(0 0 10px rgba(99, 102, 241, 0.32))",
+                }}
                 dot={false}
                 activeDot={{ r: 4 }}
               />

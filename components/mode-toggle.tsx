@@ -16,7 +16,7 @@ export function ModeToggle() {
       onClick={toggleTheme}
       size="icon"
       variant="outline"
-      className="hover:border-transparent hover:bg-transparent dark:bg-black"
+      className="hover:border-glass-border"
     >
       <Sun className="h-[1.2rem] w-[1.2rem] dark:hidden" />
       <Moon className="hidden h-[1.2rem] w-[1.2rem] dark:block" />

@@ -1,11 +1,11 @@
 "use client";
 
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useCurrency } from "@/contexts/currency-context";
 import { MonthlyNetWorthData } from "@/data/getMonthlyNetWorth";
 import { formatCurrency } from "@/lib/currency-utils";
@@ -43,7 +43,7 @@ export default function MonthlyNetWorthChart({
       </CardHeader>
       <CardContent>
         {chartData.length === 0 || maxTotal === 0 ? (
-          <div className="flex h-[300px] items-center justify-center rounded-md border border-dashed text-sm text-muted-foreground">
+          <div className="glass-surface text-muted-foreground flex h-[300px] items-center justify-center rounded-[1.5rem] border-dashed text-sm">
             No net worth history yet
           </div>
         ) : (
@@ -96,8 +96,7 @@ export default function MonthlyNetWorthChart({
                     labelFormatter={(_, payload) => {
                       if (!payload || payload.length === 0) return "";
                       const item = payload[0]?.payload as
-                        | (typeof chartData)[number]
-                        | undefined;
+                        (typeof chartData)[number] | undefined;
                       if (!item) return "";
                       return format(
                         new Date(item.year, item.month - 1, 1),

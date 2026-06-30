@@ -17,28 +17,33 @@ export default function Home({
   const t = useTranslations("home");
 
   return (
-    <main className="relative flex h-[calc(100vh-80px)] min-h-[400px] items-center justify-center bg-white">
-      <div className="relative z-10 flex flex-col gap-4 text-center">
-        <h1 className="flex items-center justify-center gap-1 text-5xl font-bold">
-          <ChartColumnBigIcon className="text-lime-500" size={60} /> NextCash
+    <div className="relative flex min-h-[calc(100vh-7rem)] items-center justify-center overflow-hidden">
+      <div className="glass-card relative z-10 mx-auto flex max-w-2xl flex-col items-center gap-6 px-8 py-10 text-center sm:px-12">
+        <h1 className="flex items-center justify-center gap-3 text-5xl font-bold tracking-[-0.06em] sm:text-6xl">
+          <span className="glass-control text-primary flex size-16 items-center justify-center rounded-[1.4rem]">
+            <ChartColumnBigIcon className="text-primary size-9" />
+          </span>
+          NextCash
         </h1>
-        <p className="text-2xl">{t("header")}</p>
+        <p className="text-muted-foreground max-w-lg text-xl leading-relaxed sm:text-2xl">
+          {t("header")}
+        </p>
         <Show when="signed-in">
           <Button asChild size="lg">
             <Link href="/portfolio">{t("btn")}</Link>
           </Button>
         </Show>
         <Show when="signed-out">
-          <div className="flex items-center justify-center gap-2">
-            <Button asChild size="lg" className="bg-lime-600 hover:bg-lime-500">
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Button asChild size="lg">
               <SignInButton />
             </Button>
-            <Button asChild size="lg">
+            <Button asChild size="lg" variant="outline">
               <SignUpButton />
             </Button>
           </div>
         </Show>
       </div>
-    </main>
+    </div>
   );
 }

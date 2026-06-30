@@ -282,7 +282,7 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
           className="space-y-6"
         >
           {/* Entry type toggle */}
-          <div className="bg-muted inline-flex rounded-full p-1 text-xs">
+          <div className="glass-control inline-flex rounded-full p-1 text-xs">
             {/* <Button
               type="button"
               size="sm"
@@ -310,7 +310,7 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
           </div>
 
           {/* Main grid */}
-          <div className="bg-background space-y-4 rounded-2xl border p-4 sm:p-6">
+          <div className="glass-card space-y-4 p-4 sm:p-6">
             {/* Asset type */}
 
             {/* Type */}
@@ -608,7 +608,7 @@ export default function NewTradeForm({ portfolios, wallets }: Props) {
           </div>
 
           {/* Cash section */}
-          <div className="bg-background space-y-4 rounded-2xl border p-4 sm:p-6">
+          <div className="glass-card space-y-4 p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">Update cash balance</p>

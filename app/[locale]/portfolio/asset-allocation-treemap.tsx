@@ -99,10 +99,7 @@ const CustomCell = ({ x, y, width, height, payload }: CustomCellProps) => {
   );
 };
 
-export default function AssetAllocationTreemap({
-  holdings,
-  currency,
-}: Props) {
+export default function AssetAllocationTreemap({ holdings, currency }: Props) {
   const { convertAmount, selectedCurrency } = useCurrency();
   // Prepare treemap data
   const treemapData: TreemapData[] = holdings
@@ -123,7 +120,7 @@ export default function AssetAllocationTreemap({
           <CardTitle>Asset Allocation Map</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-center text-muted-foreground py-10">
+          <p className="text-muted-foreground py-10 text-center">
             No assets to display
           </p>
         </CardContent>
@@ -156,9 +153,9 @@ export default function AssetAllocationTreemap({
                   }
 
                   return (
-                    <div className="rounded-lg border bg-background px-3 py-2 text-xs shadow-xl">
+                    <div className="glass-menu rounded-2xl px-3 py-2 text-xs">
                       <div className="font-medium">{item.name}</div>
-                      <div className="mt-1 text-muted-foreground">
+                      <div className="text-muted-foreground mt-1">
                         {formatCurrency(
                           convertAmount(item.value, currency),
                           selectedCurrency,
